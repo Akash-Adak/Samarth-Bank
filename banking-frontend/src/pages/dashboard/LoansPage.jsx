@@ -225,6 +225,39 @@ export default function LoansPage() {
       showNotification(typeof errorMessage === 'string' ? errorMessage : "Failed to reject loan", "error");
     }
   };
+//  handel repayment
+const handleRePayment = async (loanId) => {
+  try {
+   
+
+
+    const response = await api_loan.post(`/api/loans/${loanId}repay`);
+
+    console.log("Repayment response:", response.data);
+
+    if (response.status === 200) {
+      showNotification("Loan repayment successful!", "success");
+      fetchLoans(); // refresh table
+    } else {
+      throw new Error(response.data?.message || "Repayment failed");
+    }
+
+  } catch (err) {
+    console.error("Repayment error:", err.response?.data || err);
+
+    const errorMessage =
+      err.response?.data ||
+      err.message ||
+      "Failed to process repayment";
+
+    showNotification(
+      typeof errorMessage === "string"
+        ? errorMessage
+        : "Failed to process repayment",
+      "error"
+    );
+  }
+};
 
   // Calculate EMI
   const calculateEMI = (principal, interestRate, tenureMonths) => {
@@ -375,10 +408,7 @@ export default function LoansPage() {
           {(row.status === "ACTIVE" || row.status === "APPROVED") && (
             <button 
               className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded hover:bg-blue-200 transition-colors"
-              onClick={() => {
-                // TODO: Add repayment functionality - POST /api/loans/repay
-                showNotification("Repayment feature coming soon!", "info");
-              }}
+              onClick={() => handleRePayment(id)}
             >
               Repay
             </button>

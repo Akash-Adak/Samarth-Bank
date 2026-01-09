@@ -1,5 +1,6 @@
 package com.banking.loan.controller;
 
+import com.banking.loan.model.LoanRequestDto;
 import com.banking.loan.model.LoanResponseDto;
 import com.banking.loan.model.RepaymentDto;
 import com.banking.loan.repository.LoanRepository;
@@ -42,14 +43,23 @@ public class LoanController {
 
     // ✅ Approve Loan (Admin Only – if you want add ROLE check later)
     @PostMapping("/{loanId}/approve")
-    public ResponseEntity<?> approve(@PathVariable Long loanId) {
-        return ResponseEntity.ok(loanService.approveLoan(loanId));
+    public ResponseEntity<?> approve(@PathVariable Long loanId ,HttpServletRequest  request2) {
+        String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String tokenWithBearer = request2.getHeader("Authorization");
+        String token = tokenWithBearer.replaceFirst("(?i)^Bearer\\s+", "");
+        return ResponseEntity.ok(loanService.approveLoan(loanId,jwtUsername,token));
     }
 
     // ❌ Reject Loan (Admin Only)
     @PostMapping("/{loanId}/reject")
-    public ResponseEntity<?> reject(@PathVariable Long loanId) {
-        return ResponseEntity.ok(loanService.rejectLoan(loanId));
+    public ResponseEntity<?> reject(@PathVariable Long loanId,HttpServletRequest  request2) {
+        String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String tokenWithBearer = request2.getHeader("Authorization");
+        String token = tokenWithBearer.replaceFirst("(?i)^Bearer\\s+", "");
+        return ResponseEntity.ok(loanService.rejectLoan(loanId,jwtUsername
+        ,token));
     }
 
 
@@ -90,20 +100,15 @@ public class LoanController {
 
 
     // 🔐 Repay loan (Only for own loan)
-    @PostMapping("/repay")
-    public ResponseEntity<?> repay(@Valid @RequestBody RepaymentDto repaymentDto) {
+    @PostMapping("/{loanId}repay")
+    public ResponseEntity<?> repay(@PathVariable Long loanId,HttpServletRequest req) {
 
         String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        LoanResponseDto loan = loanService.getLoanById(repaymentDto.getLoanId());
 
-        User user = redisService.get(loan.getAccountNumber(), User.class);
+        String tokenWithBearer = req.getHeader("Authorization");
+        String token = tokenWithBearer.replaceFirst("(?i)^Bearer\\s+", "");
 
-        if (user == null || !user.getUsername().equals(jwtUsername)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("❌ You cannot repay someone else’s loan.");
-        }
-
-        return ResponseEntity.ok(loanService.makeRepayment(repaymentDto));
+        return ResponseEntity.ok(loanService.makeRepayment(loanId,jwtUsername,token));
     }
 }
