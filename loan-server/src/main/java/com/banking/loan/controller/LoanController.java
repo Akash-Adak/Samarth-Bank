@@ -1,6 +1,5 @@
 package com.banking.loan.controller;
 
-import com.banking.loan.model.LoanRequestDto;
 import com.banking.loan.model.LoanResponseDto;
 import com.banking.loan.model.RepaymentDto;
 import com.banking.loan.repository.LoanRepository;

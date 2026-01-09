@@ -15,30 +15,47 @@ export default function Login() {
 
   const API = import.meta.env.VITE_AUTH_URL;
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    if (!form.username || !form.password) {
-      setError("Please enter your Customer ID and Password.");
-      return;
-    }
+const  handleLogin = async (e) => {
+  e.preventDefault();
 
-    setLoading(true);
-    setError("");
+  console.log("Login button clicked", form);
 
-    try {
-      const res = await axios.post(`${API}/api/auth/login`, form);
-      // Simulate network delay for "verifying" feel
-      setTimeout(() => {
-        localStorage.setItem("username", form.username);
-        console.log(res);
-        login(res.data);
-        navigate("/");
-      }, 800);
-    } catch (e) {
-      setError(e.response?.data?.message || "Authentication failed. Please check your credentials.");
-      setLoading(false);
-    }
-  };
+  if (!form.username || !form.password) {
+    setError("Please enter your Customer ID and Password.");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
+  try {
+    const res = await axios.post(`${API}/api/auth/login`, form);
+
+
+    // Save data immediately
+    localStorage.setItem("username", form.username);
+    localStorage.setItem(`${form.username}-role`, res.data.role);
+
+    login(res.data.token);
+
+    // optional delay (UX only)
+    setTimeout(() => {
+      navigate("/");
+    }, 500);
+
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    console.error("BACKEND MESSAGE:", err.response?.data);
+
+    setError(
+      err.response?.data?.message ||
+      "Authentication failed. Please check your credentials."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">

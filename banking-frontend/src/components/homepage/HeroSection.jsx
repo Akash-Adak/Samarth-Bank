@@ -3,12 +3,13 @@ import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
+
 export default function HeroSection() {
   const [activeTab, setActiveTab] = useState('netbanking');
   const [isMobile, setIsMobile] = useState(false);
   const { login, user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -25,12 +26,43 @@ export default function HeroSection() {
 
   const API = import.meta.env.VITE_AUTH_URL;
 
- const handleLogin = async () => {
+const  handleLogin = async (e) => {
+  e.preventDefault();
+
+  console.log("Login button clicked", form);
+
+  if (!form.username || !form.password) {
+    setError("Please enter your Customer ID and Password.");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+
   try {
     const res = await axios.post(`${API}/api/auth/login`, form);
-    login(res.data); // ✅ correct
-  } catch (e) {
-    setError("Login failed");
+
+    // Save data immediately
+    localStorage.setItem("username", form.username);
+    localStorage.setItem(`${form.username}-role`, res.data.role);
+
+    login(res.data.token);
+
+    // optional delay (UX only)
+    setTimeout(() => {
+      navigate("/");
+    }, 500);
+
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    console.error("BACKEND MESSAGE:", err.response?.data);
+
+    setError(
+      err.response?.data?.message ||
+      "Authentication failed. Please check your credentials."
+    );
+  } finally {
+    setLoading(false);
   }
 };
 

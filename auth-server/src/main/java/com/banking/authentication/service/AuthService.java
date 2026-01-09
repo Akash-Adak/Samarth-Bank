@@ -94,38 +94,100 @@ public class AuthService {
         String subject = "Welcome to EFB, " + username + "!";
 
 // HTML Email body
-        String body = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "  <meta charset='UTF-8'>" +
-                "  <style>" +
-                "    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }" +
-                "    .container { background-color: #ffffff; padding: 20px; margin: 30px auto; width: 90%; max-width: 600px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }" +
-                "    .header { background-color: #0046be; color: white; padding: 15px; border-radius: 10px 10px 0 0; text-align: center; }" +
-                "    .content { padding: 20px; color: #333333; line-height: 1.6; }" +
-                "    .footer { text-align: center; font-size: 12px; color: #888888; padding-top: 15px; }" +
-                "    .button { display: inline-block; padding: 10px 20px; margin-top: 20px; background-color: #0046be; color: white; text-decoration: none; border-radius: 5px; }" +
-                "  </style>" +
-                "</head>" +
-                "<body>" +
-                "  <div class='container'>" +
-                "    <div class='header'>" +
-                "  <img src='https://drive.google.com/file/d/13hFniB-moq7IQEjsqXJLRgUT9cfYqr9p/view?usp=drive_link' alt='EFB Logo' class='logo'>" +
-                "      <h1>Welcome to EFB 🎉</h1>" +
-                "    </div>" +
-                "    <div class='content'>" +
-                "      <p>Hello <strong>" + username + "</strong>,</p>" +
-                "      <p>You have successfully registered with <strong>EFB – Equinox Finance Bank</strong>.</p>" +
-                "      <p>You can now access your account and start using our services.</p>" +
-                "      <a href='#' class='button'>Go to Your Dashboard</a>" +
-                "      <p>If you did not register for EFB, please ignore this email.</p>" +
-                "    </div>" +
-                "    <div class='footer'>" +
-                "      &copy; 2025 EFB – Equinox Finance Bank. All rights reserved." +
-                "    </div>" +
-                "  </div>" +
-                "</body>" +
-                "</html>";
+        String body = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome to Samarth Bank</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .header {
+      background-color: #0f3cc9;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+    .content {
+      padding: 25px;
+      color: #333333;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background-color: #0f3cc9;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 12px;
+      color: #888888;
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Welcome to Samarth Bank 🎉</h1>
+      <p>Secure • Trusted • Digital Banking</p>
+    </div>
+
+    <div class="content">
+      <p>Hello <strong>%s</strong>,</p>
+
+      <p>
+        Congratulations! Your registration with
+        <strong>Samarth Bank</strong> has been completed successfully.
+      </p>
+
+      <p>
+        You can now log in to your account and enjoy seamless, secure
+        banking services from anywhere.
+      </p>
+
+      <a href="http://samarthbank.vercel.app" class="button">
+        Go to Your Dashboard
+      </a>
+
+      <p style="margin-top: 20px;">
+        If you did not create this account, please contact our support team immediately.
+      </p>
+    </div>
+
+    <div class="footer">
+      © 2025 Samarth Bank. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
+""".formatted(username);
+
 
 // Set email event
         event.setUsername(subject); // Subject
@@ -140,74 +202,124 @@ public class AuthService {
     }
 
 
-    public String login(LoginRequest request) throws Exception {
+    public Map<String, String> login(LoginRequest request) {
+
+        // 1️⃣ Find user
         var user = repo.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!encoder.matches(request.getPassword(), user.getPassword()))
-            throw new RunTimeException("Invalid credentials");
+        // 2️⃣ Validate password
+        if (!encoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        // 3️⃣ JWT claims
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", user.getUsername());
-        claims.put("role", user.getRoles());
+        claims.put("role", user.getRoles()); // ADMIN / USER
+
+        // 4️⃣ Generate JWT
+        String token = jwtUtil.generateToken(claims, user.getUsername());
+
+        // 5️⃣ Prepare RESPONSE (THIS WAS MISSING)
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        response.put("role", user.getRoles());
+
+
+        // 6️⃣ Send login success email via Kafka
+        sendLoginSuccessMail(user);
+
+        return response; // ✅ NOW FRONTEND RECEIVES DATA
+    }
+    private void sendLoginSuccessMail(User user) {
+
+        String subject = "Login Successful – Welcome Back to Samarth Bank";
+
+        String body = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f6f8;
+              margin: 0;
+              padding: 0;
+            }
+            .container {
+              max-width: 600px;
+              margin: 30px auto;
+              background: #ffffff;
+              border-radius: 10px;
+              overflow: hidden;
+              box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+            .header {
+              background: #0f3cc9;
+              color: #ffffff;
+              text-align: center;
+              padding: 20px;
+            }
+            .content {
+              padding: 25px;
+              color: #333;
+              line-height: 1.6;
+            }
+            .button {
+              display: inline-block;
+              margin-top: 20px;
+              padding: 12px 24px;
+              background: #0f3cc9;
+              color: #ffffff;
+              text-decoration: none;
+              border-radius: 6px;
+              font-weight: bold;
+            }
+            .footer {
+              text-align: center;
+              padding: 15px;
+              font-size: 12px;
+              color: #888;
+              background: #f1f1f1;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Samarth Bank</h1>
+              <p>Secure • Reliable • Digital</p>
+            </div>
+
+            <div class="content">
+              <p>Hello <strong>%s</strong>,</p>
+              <p>Your login to <strong>Samarth Bank</strong> was successful.</p>
+              <p>If this was you, no action is needed.</p>
+              <p>If you do not recognize this activity, please reset your password immediately.</p>
+
+              <a href="http://samarthbank.vercel.app" class="button">
+                Go to Dashboard
+              </a>
+            </div>
+
+            <div class="footer">
+              © 2025 Samarth Bank. All rights reserved.
+            </div>
+          </div>
+        </body>
+        </html>
+        """.formatted(user.getUsername());
 
         RegisterRequestResponse event = new RegisterRequestResponse();
-
-
-        String username = user.getUsername();
-        String userEmail = user.getEmail();
-
-// Email subject
-        String subject = "Login Successful – Welcome Back, " + username + "!";
-
-// HTML Email body with logo
-        String body = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "  <meta charset='UTF-8'>" +
-                "  <style>" +
-                "    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }" +
-                "    .container { background-color: #ffffff; padding: 20px; margin: 30px auto; width: 90%; max-width: 600px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }" +
-                "    .header { background-color: #0046be; color: white; padding: 15px; border-radius: 10px 10px 0 0; text-align: center; }" +
-                "    .logo { max-width: 100px; margin-bottom: 10px; }" +
-                "    .content { padding: 20px; color: #333333; line-height: 1.6; }" +
-                "    .footer { text-align: center; font-size: 12px; color: #888888; padding-top: 15px; }" +
-                "    .button { display: inline-block; padding: 10px 20px; margin-top: 20px; background-color: #0046be; color: white; text-decoration: none; border-radius: 5px; }" +
-                "  </style>" +
-                "</head>" +
-                "<body>" +
-                "  <div class='container'>" +
-                "    <div class='header'>" +
-                "      <img src='https://drive.google.com/file/d/13hFniB-moq7IQEjsqXJLRgUT9cfYqr9p/view?usp=drive_link' alt='EFB Logo' class='logo'>" +
-                "      <h1>Login Successful 🎉</h1>" +
-                "    </div>" +
-                "    <div class='content'>" +
-                "      <p>Hello <strong>" + username + "</strong>,</p>" +
-                "      <p>You have successfully logged into <strong>EFB – Equinox Finance Bank</strong>.</p>" +
-                "      <p>Access your dashboard and manage your account securely.</p>" +
-                "      <a href='#' class='button'>Go to Dashboard</a>" +
-                "      <p>If this was not you, please reset your password immediately.</p>" +
-                "    </div>" +
-                "    <div class='footer'>" +
-                "      &copy; 2025 EFB – Equinox Finance Bank. All rights reserved." +
-                "    </div>" +
-                "  </div>" +
-                "</body>" +
-                "</html>";
-
-// Prepare event object
-        event.setUsername(subject); // Email subject
-        event.setEmail(userEmail);  // Recipient email
-        event.setBody(body);        // HTML email body
+        event.setUsername(subject);
+        event.setEmail(user.getEmail());
+        event.setBody(body);
         event.setContentType("text/html");
-// Convert to JSON
+
         String json = new Gson().toJson(event);
-
-// json now contains the full HTML email with subject, ready to send
-
         kafkaProducerService.sendLoginSuccess("banking-users", json);
-
-        return jwtUtil.generateToken(claims, user.getUsername());
-
     }
 
 }

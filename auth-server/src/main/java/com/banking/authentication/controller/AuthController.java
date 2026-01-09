@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -40,9 +42,9 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) throws Exception{
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) throws Exception{
 
-        String s=authService.login(request);
+        Map<String,String> s =authService.login(request);
 
        if(s==null)
            return new ResponseEntity<>("User not found! register first",HttpStatus.NOT_FOUND);

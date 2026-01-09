@@ -1,44 +1,58 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
+
 import UserDashboard from "./pages/dashboard/UserDashboard";
 import AccountsPage from "./pages/dashboard/AccountsPage";
 import TransactionsPage from "./pages/dashboard/TransactionsPage";
 import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import LoansPage from "./pages/dashboard/LoansPage";
-import AdminDashboard from "./pages/dashboard/AdminDashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
 import ProfilePage from "./pages/dashboard/ProfilePage";
+import AdminDashboard from "./pages/dashboard/AdminDashboard";
+
 import SendMoney from "./pages/money/SendMoney";
 import AddMoney from "./pages/money/AddMoney";
 import Withdraw from "./pages/money/WithDraw";
+
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 export default function App() {
+  const username = localStorage.getItem("username");
+  const role = username
+    ? localStorage.getItem(`${username}-role`)
+    : null;
+
   return (
-
     <>
-        <Navbar/>
-      <Routes>
-      
-        <Route path="/" element={<Home/>} />
+      <Navbar />
 
+      <Routes>
+        {/* Public */}
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
+        {/* SMART DASHBOARD ROUTE */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <UserDashboard />
+              {role === "ADMIN" ? (
+                <Navigate to="/admin" replace />
+              ) : (
+                <UserDashboard />
+              )}
             </ProtectedRoute>
           }
         />
 
+        {/* User Routes */}
         <Route
           path="/dashboard/accounts"
           element={
@@ -57,7 +71,6 @@ export default function App() {
           }
         />
 
-
         <Route
           path="/dashboard/notifications"
           element={
@@ -75,15 +88,45 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-<Route
-  path="/dashboard/profile"
-  element={
-    <ProtectedRoute>
-      <ProfilePage />
-    </ProtectedRoute>
-  }
-/>
 
+        <Route
+          path="/dashboard/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Money Operations */}
+        <Route
+          path="/send-money"
+          element={
+            <ProtectedRoute>
+              <SendMoney />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/add-money"
+          element={
+            <ProtectedRoute>
+              <AddMoney />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/withdraw"
+          element={
+            <ProtectedRoute>
+              <Withdraw />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ADMIN ROUTE */}
         <Route
           path="/admin"
           element={
@@ -93,15 +136,20 @@ export default function App() {
           }
         />
 
-
-        <Route path="/send-money" element={<SendMoney />} />
-<Route path="/add-money" element={<AddMoney />} />
-<Route path="/withdraw" element={<Withdraw />} />
-
+        {/* SAFETY FALLBACK */}
+        <Route
+          path="*"
+          element={
+            role === "ADMIN" ? (
+              <Navigate to="/admin" replace />
+            ) : (
+              <Navigate to="/dashboard" replace />
+            )
+          }
+        />
       </Routes>
 
-<Footer />
-   
-</>
+      <Footer />
+    </>
   );
 }
