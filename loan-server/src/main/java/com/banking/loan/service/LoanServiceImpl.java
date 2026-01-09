@@ -5,6 +5,7 @@ import com.banking.loan.repository.LoanRepository;
 import com.banking.loan.response.AccountResponse;
 import com.banking.loan.response.LoanMsg;
 import com.banking.loan.response.User;
+import com.banking.loan.response.UserResponse;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -34,9 +36,9 @@ public class LoanServiceImpl implements LoanService {
     @Autowired
     private  KafkaProducerService kafkaProducerService;
 
-    public LoanResponseDto applyLoan(LoanRequestDto req,String username, String token) throws AccessDeniedException {
 
-
+    @Override
+    public LoanResponseDto applyLoan(LoanRequestDto req, String username, String token) throws AccessDeniedException {
 
         // 🔐 Headers
         HttpHeaders headers = new HttpHeaders();
@@ -102,10 +104,8 @@ public class LoanServiceImpl implements LoanService {
         return mapToDto(saved);
     }
 
-
-
     @Override
-    public LoanResponseDto approveLoan(Long loanId) {
+    public LoanResponseDto approveLoan(Long loanId,String username,String token) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
@@ -115,9 +115,26 @@ public class LoanServiceImpl implements LoanService {
         loan.setUpdatedAt(LocalDate.now());
 
         Loan saved = loanRepository.save(loan);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        User user = redisService.get(loan.getAccountNumber(), User.class);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
+        // 📡 Call Account Service
+        ResponseEntity<UserResponse> response = restTemplate.exchange(
+                "http://USER/api/users/{username}",
+                HttpMethod.GET,
+                entity,
+                UserResponse.class,
+                username
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new RuntimeException("Account service validation failed");
+        }
+
+        UserResponse user=response.getBody();
         LoanMsg event = new LoanMsg();
         String fullname = user.getUsername();
         String email = user.getEmail();
@@ -141,7 +158,7 @@ public class LoanServiceImpl implements LoanService {
                 "<body>" +
                 "  <div class='container'>" +
                 "    <div class='header'>" +
-                "      <img src='YOUR_LOGO_URL_HERE' alt='EFB Logo' class='logo'>" +
+                "      <img src='YOUR_LOGO_URL_HERE' alt='Samarth Bank Logo' class='logo'>" +
                 "      <h1>Loan Approved ✔️</h1>" +
                 "    </div>" +
                 "    <div class='content'>" +
@@ -150,11 +167,11 @@ public class LoanServiceImpl implements LoanService {
                 "      <p><strong>Approved Amount:</strong> ₹" + loan.getPrincipalAmount() + "</p>" +
                 "      <p><strong>EMI Amount:</strong> ₹" + loan.getEmiAmount() + "</p>" +
                 "      <p><strong>Tenure:</strong> " + loan.getTenureMonths() + " months</p>" +
-                "      <p>You can now view your repayment schedule in your <strong>EFB Dashboard</strong>.</p>" +
+                "      <p>You can now view your repayment schedule in your <strong>Samarth Bank Dashboard</strong>.</p>" +
                 "      <p>Thank you for banking with us.</p>" +
                 "    </div>" +
                 "    <div class='footer'>" +
-                "      &copy; 2025 EFB – Equinox Finance Bank. All rights reserved." +
+                "      &copy; 2025 Samarth Bank . All rights reserved." +
                 "    </div>" +
                 "  </div>" +
                 "</body>" +
@@ -173,7 +190,8 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public LoanResponseDto rejectLoan(Long loanId) {
+    public LoanResponseDto rejectLoan(Long loanId, String username, String token) {
+
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
@@ -181,6 +199,139 @@ public class LoanServiceImpl implements LoanService {
         loan.setUpdatedAt(LocalDate.now());
 
         Loan saved = loanRepository.save(loan);
+
+        // 🔐 Prepare auth headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // 📡 Call User Service
+        ResponseEntity<UserResponse> response = restTemplate.exchange(
+                "http://USER/api/users/{username}",
+                HttpMethod.GET,
+                entity,
+                UserResponse.class,
+                username
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new RuntimeException("User service validation failed");
+        }
+
+        UserResponse user = response.getBody();
+        String fullName = user.getUsername();
+        String email = user.getEmail();
+
+        // 📧 Email subject
+        String subject = "Update on Your Loan Application – Samarth Bank";
+
+        // 📧 Email HTML (REJECTION)
+        String body = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Loan Application Update</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              background-color: #f4f6f8;
+              margin: 0;
+              padding: 0;
+            }
+            .container {
+              max-width: 600px;
+              margin: 30px auto;
+              background: #ffffff;
+              border-radius: 10px;
+              overflow: hidden;
+              box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+            .header {
+              background-color: #b91c1c;
+              color: #ffffff;
+              text-align: center;
+              padding: 20px;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 24px;
+            }
+            .content {
+              padding: 25px;
+              color: #333333;
+              line-height: 1.6;
+              font-size: 15px;
+            }
+            .highlight {
+              font-weight: bold;
+              color: #b91c1c;
+            }
+            .footer {
+              text-align: center;
+              padding: 15px;
+              font-size: 12px;
+              color: #888888;
+              background-color: #f1f1f1;
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Loan Application Update</h1>
+              <p>Samarth Bank</p>
+            </div>
+
+            <div class="content">
+              <p>Hello <strong>%s</strong>,</p>
+
+              <p>
+                Thank you for applying for a
+                <span class="highlight">%s</span> loan with
+                <strong>Samarth Bank</strong>.
+              </p>
+
+              <p>
+                After careful review, we regret to inform you that your loan
+                application could not be approved at this time.
+              </p>
+
+              <p>
+                This decision may be based on internal eligibility criteria,
+                credit assessment, or documentation review.
+              </p>
+
+              <p>
+                You are welcome to reapply in the future or contact our support
+                team for further clarification.
+              </p>
+
+              <p>
+                We appreciate your interest in Samarth Bank and look forward
+                to serving you again.
+              </p>
+            </div>
+
+            <div class="footer">
+              © 2025 Samarth Bank. All rights reserved.
+            </div>
+          </div>
+        </body>
+        </html>
+        """.formatted(fullName, loan.getLoanType());
+
+        // 📦 Kafka / Email event
+        LoanMsg event = new LoanMsg();
+        event.setUsername(subject);
+        event.setEmail(email);
+        event.setBody(body);
+
+        String json = new Gson().toJson(event);
+        kafkaProducerService.sendLoanMsg("banking-loans", json);
+
         return mapToDto(saved);
     }
 
@@ -200,14 +351,14 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public LoanResponseDto makeRepayment(RepaymentDto repaymentDto) {
+    public LoanResponseDto makeRepayment(Long loanId,String username,String token) {
 
-        Loan loan = loanRepository.findById(repaymentDto.getLoanId())
+        Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
         // Calculate remaining amount BEFORE repayment
         BigDecimal principal = loan.getPrincipalAmount();
-        BigDecimal emiPaid = repaymentDto.getAmountPaid();
+        BigDecimal emiPaid = loan.getEmiAmount();
 
         // Prevent over-payment negative balance
         BigDecimal remainingBefore = principal;
@@ -230,13 +381,30 @@ public class LoanServiceImpl implements LoanService {
 
         Loan saved = loanRepository.save(loan);
 
-        // FETCH USER FROM REDIS
-        User user = redisService.get(loan.getAccountNumber(), User.class);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        // 📡 Call User Service
+        ResponseEntity<UserResponse> response = restTemplate.exchange(
+                "http://USER/api/users/{username}",
+                HttpMethod.GET,
+                entity,
+                UserResponse.class,
+                username
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new RuntimeException("User service validation failed");
+        }
+
+        UserResponse user = response.getBody();
         String fullname = user.getUsername();
         String email = user.getEmail();
 
         // EMAIL SUBJECT
-        String subject = "💳 Loan Repayment Successful – EFB Bank";
+        String subject = "💳 Loan Repayment Successful – Samarth Bank Bank";
 
         // FINAL EMAIL HTML BODY
         String body = "<!DOCTYPE html>" +
@@ -256,7 +424,7 @@ public class LoanServiceImpl implements LoanService {
                 "<body>" +
                 "  <div class='container'>" +
                 "    <div class='header'>" +
-                "      <img src='YOUR_LOGO_URL_HERE' alt='EFB Logo' class='logo'>" +
+                "      <img src='YOUR_LOGO_URL_HERE' alt='Samarth Bank Logo' class='logo'>" +
                 "      <h1>Payment Successful 💳</h1>" +
                 "    </div>" +
                 "    <div class='content'>" +
@@ -269,7 +437,7 @@ public class LoanServiceImpl implements LoanService {
                 "      <p>Thank you for maintaining a good repayment record.</p>" +
                 "    </div>" +
                 "    <div class='footer'>" +
-                "      &copy; 2025 EFB – Equinox Finance Bank. All rights reserved." +
+                "      &copy; 2025 Samarth Bank – Equinox Finance Bank. All rights reserved." +
                 "    </div>" +
                 "  </div>" +
                 "</body>" +

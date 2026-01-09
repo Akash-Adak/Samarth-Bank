@@ -12,15 +12,15 @@ public interface LoanService {
 
     LoanResponseDto applyLoan(LoanRequestDto request,String username,String token) throws AccessDeniedException;
 
-    LoanResponseDto approveLoan(Long loanId);
+    LoanResponseDto approveLoan(Long loanId,String username,String token);
 
-    LoanResponseDto rejectLoan(Long loanId);
+    LoanResponseDto rejectLoan(Long loanId,String username,String token);
 
     List<LoanResponseDto> getLoansByAccountNumber(String accountNumber);
 
     LoanResponseDto getLoanById(Long id);
 
-    LoanResponseDto makeRepayment(RepaymentDto repaymentDto);
+    LoanResponseDto makeRepayment(Long loanId,String username,String token);
 
 //    Object applyxdLoan(@Valid LoanRequestDto request);
 }
