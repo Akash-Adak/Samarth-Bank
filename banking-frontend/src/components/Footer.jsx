@@ -21,10 +21,17 @@ export default function Footer() {
           <div className="space-y-6">
             <div className="flex items-center gap-3 text-white">
               {/* <div className="w-10 h-10 bg-blue-700 rounded-lg flex items-center justify-center font-bold text-2xl shadow-lg shadow-blue-900/50">B</div> */}
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-blue-200 transition-all duration-300 group-hover:scale-105">
-                  <Icon name="bank" className="text-white text-lg" />
-                </div>
-              <span className="text-2xl font-bold tracking-tight">Samarth Bank</span>
+                <div className="relative flex items-center justify-center">
+                <img 
+                      src="/vasta-bank-logo.png" 
+                      alt="Vasta Logo" 
+                      /* Changed h-11 to h-16 for a significantly larger presence */
+                      className="h-16 w-auto object-contain transition-all duration-500 group-hover:scale-110 filter drop-shadow-2xl"
+                    />
+                      
+                
+              </div>
+              <span className="text-2xl font-bold tracking-tight">V Λ S T Λ</span>
             </div>
             <p className="text-sm leading-relaxed text-gray-500">
               India's most trusted digital banking partner. Providing secure, fast, and accessible financial services to over 10 million customers.
@@ -90,7 +97,7 @@ export default function Footer() {
                   <i className="fas fa-envelope text-xs"></i>
                 </div>
                 <div>
-                  <div className="text-white font-medium">samarthbank.official@gmail.com</div>
+                  <div className="text-white font-medium">vastabank.official@gmail.com</div>
                   <div className="text-[10px] text-gray-500 uppercase tracking-wide mt-1">Priority Support</div>
                 </div>
               </li>
@@ -161,7 +168,7 @@ export default function Footer() {
         {/* Bottom Bar: Copyright & Utility Links */}
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
           <div className="text-gray-500">
-            &copy; {new Date().getFullYear()} Samarth Bank Ltd. All Rights Reserved.
+            &copy; {new Date().getFullYear()}  VΛSTΛ Bank Ltd. All Rights Reserved.
           </div>
           <div className="flex flex-wrap justify-center gap-6">
             <a href="#" className="text-gray-500 hover:text-white transition-colors">Privacy Policy</a>

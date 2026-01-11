@@ -265,7 +265,7 @@ export default function Navbar() {
             </span>
             <span className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
               <Icon name="envelope" className="text-green-400" /> 
-              <span>samarthbank.official@gmail.com</span>
+              <span>vastabank.official@gmail.com</span>
             </span>
           </div>
           <div className="flex items-center space-x-4">
@@ -297,18 +297,34 @@ export default function Navbar() {
           <div className="flex justify-between items-center h-16 xl:h-20">
             
             {/* Logo */}
-            <div className="flex-shrink-0 flex items-center z-[60]">
-              <a href="/" className="flex items-center space-x-3 group">
-              {/* <img src="/public/samarth1.png" alt=""  className="w-10 h-10"/> */}
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-blue-200 transition-all duration-300 group-hover:scale-105">
-                  <Icon name="university" className="text-white text-lg" />
+          <div className="flex-shrink-0 flex items-center z-[60]">
+            <a href="/" className="flex items-center space-x-3 group">
+              
+              <div className="relative flex items-center justify-center">
+                <img 
+                      src="/vasta-bank-logo.png" 
+                      alt="Vasta Logo" 
+                      /* Changed h-11 to h-16 for a significantly larger presence */
+                      className="h-16 w-auto object-contain transition-all duration-500 group-hover:scale-110 filter drop-shadow-2xl"
+                    />
+                      
+                
+              </div>
+
+              {/* Text Branding */}
+              <div className="flex flex-col leading-none">
+                <div className="flex items-baseline">
+                  <span className="text-4xl font-[900] text-[#1a365d] tracking-widest uppercase font-sans transition-colors duration-300 group-hover:text-blue-800">
+                    V Λ S T Λ
+                  </span>
+                  <span className="ml-1.5 text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] self-end mb-1">
+                    Bank
+                  </span>
                 </div>
-                <div>
-                  <div className="text-4xl font-black text-slate-800 tracking-tight leading-none group-hover:text-blue-700 transition-colors">Samarth Bank</div>
-                  <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Digital Banking</div>
-                </div>
-              </a>
-            </div>
+                <div className="h-[3px] w-8 bg-blue-600 rounded-full mt-1 transition-all duration-300 group-hover:w-full opacity-80"></div>
+              </div>
+            </a>
+          </div>
 
             {/* Desktop Menu (Hidden on Mobile) */}
             {!user && (

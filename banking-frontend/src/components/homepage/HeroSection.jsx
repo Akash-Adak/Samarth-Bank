@@ -166,13 +166,13 @@ const  handleLogin = async (e) => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/homepage.jpg" 
+            src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2000" 
             alt="Bank Staff Helping Customer" 
             className="w-full h-full object-cover object-[50%_20%] sm:object-center"
             loading="eager"
           />
           {/* Light Gradient Overlay for Text Readability on Light Backgrounds */}
-          {/* <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/50 to-transparent lg:bg-gradient-to-r lg:from-white/90 lg:via-white/40 lg:to-transparent"></div> */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/90 via-white/50 to-transparent lg:bg-gradient-to-r lg:from-white/90 lg:via-white/40 lg:to-transparent"></div>
         </div>
 
         {/* Content Container */}
