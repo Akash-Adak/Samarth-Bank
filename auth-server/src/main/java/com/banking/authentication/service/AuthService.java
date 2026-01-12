@@ -91,7 +91,7 @@ public class AuthService {
         String userEmail = request.getEmail();
 
 // Email subject
-        String subject = "Welcome to EFB, " + username + "!";
+        String subject = "Welcome to VASTA, " + username + "!";
 
 // HTML Email body
         String body = """
@@ -99,7 +99,7 @@ public class AuthService {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Welcome to Samarth Bank</title>
+  <title>Welcome to VASTA Bank</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -154,7 +154,7 @@ public class AuthService {
 <body>
   <div class="container">
     <div class="header">
-      <h1>Welcome to Samarth Bank 🎉</h1>
+      <h1>Welcome to VASTA Bank 🎉</h1>
       <p>Secure • Trusted • Digital Banking</p>
     </div>
 
@@ -163,7 +163,7 @@ public class AuthService {
 
       <p>
         Congratulations! Your registration with
-        <strong>Samarth Bank</strong> has been completed successfully.
+        <strong>VASTA Bank</strong> has been completed successfully.
       </p>
 
       <p>
@@ -171,7 +171,7 @@ public class AuthService {
         banking services from anywhere.
       </p>
 
-      <a href="http://samarthbank.vercel.app" class="button">
+      <a href="http://vasta-bank.vercel.app" class="button">
         Go to Your Dashboard
       </a>
 
@@ -181,7 +181,7 @@ public class AuthService {
     </div>
 
     <div class="footer">
-      © 2025 Samarth Bank. All rights reserved.
+      © 2025 VASTA Bank. All rights reserved.
     </div>
   </div>
 </body>
@@ -234,7 +234,7 @@ public class AuthService {
     }
     private void sendLoginSuccessMail(User user) {
 
-        String subject = "Login Successful – Welcome Back to Samarth Bank";
+        String subject = "Login Successful – Welcome Back to VASTA Bank";
 
         String body = """
         <!DOCTYPE html>
@@ -289,23 +289,23 @@ public class AuthService {
         <body>
           <div class="container">
             <div class="header">
-              <h1>Samarth Bank</h1>
+              <h1>VASTA Bank</h1>
               <p>Secure • Reliable • Digital</p>
             </div>
 
             <div class="content">
               <p>Hello <strong>%s</strong>,</p>
-              <p>Your login to <strong>Samarth Bank</strong> was successful.</p>
+              <p>Your login to <strong>VASTA Bank</strong> was successful.</p>
               <p>If this was you, no action is needed.</p>
               <p>If you do not recognize this activity, please reset your password immediately.</p>
 
-              <a href="http://samarthbank.vercel.app" class="button">
+              <a href="http://vasta-bank.vercel.app" class="button">
                 Go to Dashboard
               </a>
             </div>
 
             <div class="footer">
-              © 2025 Samarth Bank. All rights reserved.
+              © 2025 VASTA Bank. All rights reserved.
             </div>
           </div>
         </body>
