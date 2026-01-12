@@ -178,7 +178,7 @@ public class LoanServiceImpl implements LoanService {
                 "<body>" +
                 "  <div class='container'>" +
                 "    <div class='header'>" +
-                "      <img src='YOUR_LOGO_URL_HERE' alt='Samarth Bank Logo' class='logo'>" +
+                "      <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' class='logo'>" +
                 "      <h1>Loan Approved ✔️</h1>" +
                 "    </div>" +
                 "    <div class='content'>" +
@@ -187,11 +187,11 @@ public class LoanServiceImpl implements LoanService {
                 "      <p><strong>Approved Amount:</strong> ₹" + loan.getPrincipalAmount() + "</p>" +
                 "      <p><strong>EMI Amount:</strong> ₹" + loan.getEmiAmount() + "</p>" +
                 "      <p><strong>Tenure:</strong> " + loan.getTenureMonths() + " months</p>" +
-                "      <p>You can now view your repayment schedule in your <strong>Samarth Bank Dashboard</strong>.</p>" +
+                "      <p>You can now view your repayment schedule in your <strong>VASTA Bank Dashboard</strong>.</p>" +
                 "      <p>Thank you for banking with us.</p>" +
                 "    </div>" +
                 "    <div class='footer'>" +
-                "      &copy; 2025 Samarth Bank . All rights reserved." +
+                "      &copy; 2025 VASTA Bank . All rights reserved." +
                 "    </div>" +
                 "  </div>" +
                 "</body>" +
@@ -244,7 +244,7 @@ public class LoanServiceImpl implements LoanService {
         String email = user.getEmail();
 
         // 📧 Email subject
-        String subject = "Update on Your Loan Application – Samarth Bank";
+        String subject = "Update on Your Loan Application – VASTA Bank";
 
         // 📧 Email HTML (REJECTION)
         String body = """
@@ -302,7 +302,7 @@ public class LoanServiceImpl implements LoanService {
           <div class="container">
             <div class="header">
               <h1>Loan Application Update</h1>
-              <p>Samarth Bank</p>
+              <p>VASTA Bank</p>
             </div>
 
             <div class="content">
@@ -311,7 +311,7 @@ public class LoanServiceImpl implements LoanService {
               <p>
                 Thank you for applying for a
                 <span class="highlight">%s</span> loan with
-                <strong>Samarth Bank</strong>.
+                <strong>VASTA Bank</strong>.
               </p>
 
               <p>
@@ -330,13 +330,13 @@ public class LoanServiceImpl implements LoanService {
               </p>
 
               <p>
-                We appreciate your interest in Samarth Bank and look forward
+                We appreciate your interest in VASTA Bank and look forward
                 to serving you again.
               </p>
             </div>
 
             <div class="footer">
-              © 2025 Samarth Bank. All rights reserved.
+              © 2025 VASTA Bank. All rights reserved.
             </div>
           </div>
         </body>
@@ -424,7 +424,7 @@ public class LoanServiceImpl implements LoanService {
         String email = user.getEmail();
 
         // EMAIL SUBJECT
-        String subject = "💳 Loan Repayment Successful – Samarth Bank Bank";
+        String subject = "💳 Loan Repayment Successful – VASTA Bank Bank";
 
         // FINAL EMAIL HTML BODY
         String body = "<!DOCTYPE html>" +
@@ -444,7 +444,7 @@ public class LoanServiceImpl implements LoanService {
                 "<body>" +
                 "  <div class='container'>" +
                 "    <div class='header'>" +
-                "      <img src='YOUR_LOGO_URL_HERE' alt='Samarth Bank Logo' class='logo'>" +
+                "      <img src='YOUR_LOGO_URL_HERE' alt='VASTA Bank Logo' class='logo'>" +
                 "      <h1>Payment Successful 💳</h1>" +
                 "    </div>" +
                 "    <div class='content'>" +
@@ -457,7 +457,7 @@ public class LoanServiceImpl implements LoanService {
                 "      <p>Thank you for maintaining a good repayment record.</p>" +
                 "    </div>" +
                 "    <div class='footer'>" +
-                "      &copy; 2025 Samarth Bank – Equinox Finance Bank. All rights reserved." +
+                "      &copy; 2025 VASTA Bank – Equinox Finance Bank. All rights reserved." +
                 "    </div>" +
                 "  </div>" +
                 "</body>" +
