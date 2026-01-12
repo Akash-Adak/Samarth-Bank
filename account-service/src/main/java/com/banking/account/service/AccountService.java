@@ -83,44 +83,71 @@ public class AccountService {
         String subject = "🎉 Account Created Successfully – Welcome " + fullname + "!";
 
 // HTML Email body
-        String body = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "  <meta charset='UTF-8'>" +
-                "  <style>" +
-                "    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }" +
-                "    .container { background-color: #ffffff; padding: 20px; margin: 30px auto; width: 90%; max-width: 600px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }" +
-                "    .header { background-color: #0046be; color: white; padding: 15px; border-radius: 10px 10px 0 0; text-align: center; }" +
-                "    .logo { max-width: 100px; margin-bottom: 10px; }" +
-                "    .content { padding: 20px; color: #333333; line-height: 1.6; }" +
-                "    .footer { text-align: center; font-size: 12px; color: #888888; padding-top: 15px; }" +
-                "    .button { display: inline-block; padding: 10px 20px; margin-top: 20px; background-color: #0046be; color: white; text-decoration: none; border-radius: 5px; }" +
-                "  </style>" +
-                "</head>" +
-                "<body>" +
-                "  <div class='container'>" +
-                "    <div class='header'>" +
-                "      <img src='https://drive.google.com/file/d/13hFniB-moq7IQEjsqXJLRgUT9cfYqr9p/view?usp=drive_link' alt='EFB Logo' class='logo'>" +
-                "      <h1>Account Created Successfully 🎉</h1>" +
-                "    </div>" +
-                "    <div class='content'>" +
-                "      <p>Hello <strong>" + fullname + "</strong>,</p>" +
-                "      <p>Your bank account has been created successfully with <strong>EFB – Equinox Finance Bank</strong>.</p>" +
-                "      <p>You can now:</p>" +
-                "      <ul>" +
-                "        <li>View your account details</li>" +
-                "        <li>Check your balance</li>" +
-                "        <li>Start making transactions</li>" +
-                "      </ul>" +
-                "      <a href='#' class='button'>Go to Your Account</a>" +
-                "      <p>Thank you for choosing EFB!</p>" +
-                "    </div>" +
-                "    <div class='footer'>" +
-                "      &copy; 2025 EFB – Equinox Finance Bank. All rights reserved." +
-                "    </div>" +
-                "  </div>" +
-                "</body>" +
-                "</html>";
+        String body =
+                "<!DOCTYPE html>" +
+                        "<html lang='en'>" +
+                        "<head>" +
+                        "  <meta charset='UTF-8'>" +
+                        "  <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+                        "  <title>VASTA Bank | Account Created</title>" +
+                        "</head>" +
+                        "<body style='margin:0; padding:0; background-color:#f2f4f7; font-family:Arial, Helvetica, sans-serif;'>" +
+
+                        "  <table width='100%' cellpadding='0' cellspacing='0'>" +
+                        "    <tr>" +
+                        "      <td align='center' style='padding:30px 10px;'>" +
+
+                        "        <table width='100%' cellpadding='0' cellspacing='0' style='max-width:600px; background:#ffffff; border-radius:8px; overflow:hidden;'>" +
+
+                        "          <!-- Header -->" +
+                        "          <tr>" +
+                        "            <td style='background:#0a3cff; padding:20px; text-align:center;'>" +
+                        "              <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:120px; margin-bottom:10px;'>" +
+                        "              <h1 style='color:#ffffff; margin:0; font-size:22px;'>Welcome to VASTA Bank</h1>" +
+                        "            </td>" +
+                        "          </tr>" +
+
+                        "          <!-- Content -->" +
+                        "          <tr>" +
+                        "            <td style='padding:25px; color:#333333; font-size:15px; line-height:1.6;'>" +
+                        "              <p>Dear <strong>" + fullname + "</strong>,</p>" +
+
+                        "              <p>Your bank account has been <strong>successfully created</strong> with <strong>VASTA Bank</strong>.</p>" +
+
+                        "              <p>You can now enjoy:</p>" +
+                        "              <ul style='padding-left:18px;'>" +
+                        "                <li>Secure access to your account</li>" +
+                        "                <li>Real-time balance and transaction tracking</li>" +
+                        "                <li>Fast and safe digital banking services</li>" +
+                        "              </ul>" +
+
+                        "              <p style='text-align:center; margin:30px 0;'>" +
+                        "                <a href='#' style='background:#0a3cff; color:#ffffff; padding:12px 24px; text-decoration:none; border-radius:5px; font-weight:bold;'>Access Your Account</a>" +
+                        "              </p>" +
+
+                        "              <p>If you have any questions, our support team is always here to help.</p>" +
+
+                        "              <p>Thank you for trusting <strong>VASTA Bank</strong>.</p>" +
+                        "              <p style='margin-top:20px;'><strong>— Team VASTA</strong></p>" +
+                        "            </td>" +
+                        "          </tr>" +
+
+                        "          <!-- Footer -->" +
+                        "          <tr>" +
+                        "            <td style='background:#f7f7f7; padding:15px; text-align:center; font-size:12px; color:#777777;'>" +
+                        "              © 2026 VASTA Bank. All rights reserved.<br>" +
+                        "              Secure • Reliable • Digital Banking" +
+                        "            </td>" +
+                        "          </tr>" +
+
+                        "        </table>" +
+                        "      </td>" +
+                        "    </tr>" +
+                        "  </table>" +
+
+                        "</body>" +
+                        "</html>";
+
 
 // Set the event for Kafka or email sending
         event.setUsername(subject); // Email subject
@@ -180,42 +207,82 @@ public class AccountService {
                 String subject = "💸 Amount Debited – ₹" + amount + " from your account";
 
 // HTML Email body
-                String body = "<!DOCTYPE html>" +
-                        "<html>" +
-                        "<head>" +
-                        "  <meta charset='UTF-8'>" +
-                        "  <style>" +
-                        "    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }" +
-                        "    .container { background-color: #ffffff; padding: 20px; margin: 30px auto; width: 90%; max-width: 600px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }" +
-                        "    .header { background-color: #0046be; color: white; padding: 15px; border-radius: 10px 10px 0 0; text-align: center; }" +
-                        "    .logo { max-width: 100px; margin-bottom: 10px; }" +
-                        "    .content { padding: 20px; color: #333333; line-height: 1.6; }" +
-                        "    .footer { text-align: center; font-size: 12px; color: #888888; padding-top: 15px; }" +
-                        "    .highlight { font-weight: bold; color: #0046be; }" +
-                        "  </style>" +
-                        "</head>" +
-                        "<body>" +
-                        "  <div class='container'>" +
-                        "    <div class='header'>" +
-                        "      <img src='https://drive.google.com/file/d/13hFniB-moq7IQEjsqXJLRgUT9cfYqr9p/view?usp=drive_link' alt='EFB Logo' class='logo'>" +
-                        "      <h1>Amount Debited Successfully 💸</h1>" +
-                        "    </div>" +
-                        "    <div class='content'>" +
-                        "      <p>Hello <strong>" + fullname + "</strong>,</p>" +
-                        "      <p>The following transaction has been processed from your account <span class='highlight'>" + maskedAccount + "</span>:</p>" +
-                        "      <ul>" +
-                        "        <li>Amount Debited: <span class='highlight'>₹" + amount + "</span></li>" +
-                        "        <li>Current Balance: <span class='highlight'>₹" + account.getBalance() + "</span></li>" +
-                        "        <li>Date: " + formattedDate + "</li>" +
-                        "      </ul>" +
-                        "      <p>Thank you for banking with <strong>EFB – Equinox Finance Bank</strong>.</p>" +
-                        "    </div>" +
-                        "    <div class='footer'>" +
-                        "      &copy; 2025 EFB – Equinox Finance Bank. All rights reserved." +
-                        "    </div>" +
-                        "  </div>" +
-                        "</body>" +
-                        "</html>";
+                String body =
+                        "<!DOCTYPE html>" +
+                                "<html lang='en'>" +
+                                "<head>" +
+                                "  <meta charset='UTF-8'>" +
+                                "  <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+                                "  <title>VASTA Bank | Debit Alert</title>" +
+                                "</head>" +
+
+                                "<body style='margin:0; padding:0; background-color:#f4f6f9; font-family:Arial, Helvetica, sans-serif;'>" +
+
+                                "  <table width='100%' cellpadding='0' cellspacing='0'>" +
+                                "    <tr>" +
+                                "      <td align='center' style='padding:30px 10px;'>" +
+
+                                "        <table width='100%' cellpadding='0' cellspacing='0' style='max-width:600px; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08);'>" +
+
+                                "          <!-- Header -->" +
+                                "          <tr>" +
+                                "            <td style='background:#0a3cff; padding:18px; text-align:center;'>" +
+                                "              <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:110px; margin-bottom:8px;'>" +
+                                "              <h2 style='color:#ffffff; margin:0; font-size:20px;'>Debit Transaction Alert</h2>" +
+                                "            </td>" +
+                                "          </tr>" +
+
+                                "          <!-- Content -->" +
+                                "          <tr>" +
+                                "            <td style='padding:24px; color:#333333; font-size:14.5px; line-height:1.6;'>" +
+
+                                "              <p>Dear <strong>" + fullname + "</strong>,</p>" +
+
+                                "              <p>A transaction has been <strong>successfully debited</strong> from your VASTA Bank account.</p>" +
+
+                                "              <table width='100%' cellpadding='6' cellspacing='0' style='margin:15px 0; font-size:14px;'>" +
+                                "                <tr>" +
+                                "                  <td>Account Number</td>" +
+                                "                  <td style='font-weight:bold; text-align:right;'>" + maskedAccount + "</td>" +
+                                "                </tr>" +
+                                "                <tr>" +
+                                "                  <td>Amount Debited</td>" +
+                                "                  <td style='font-weight:bold; text-align:right;'>₹" + amount + "</td>" +
+                                "                </tr>" +
+                                "                <tr>" +
+                                "                  <td>Available Balance</td>" +
+                                "                  <td style='font-weight:bold; text-align:right;'>₹" + account.getBalance() + "</td>" +
+                                "                </tr>" +
+                                "                <tr>" +
+                                "                  <td>Transaction Date</td>" +
+                                "                  <td style='text-align:right;'>" + formattedDate + "</td>" +
+                                "                </tr>" +
+                                "              </table>" +
+
+                                "              <p>If you do not recognize this transaction, please contact VASTA Bank support immediately.</p>" +
+
+                                "              <p style='margin-top:20px;'>Thank you for choosing <strong>VASTA Bank</strong>.</p>" +
+                                "              <p><strong>— Team VASTA</strong></p>" +
+
+                                "            </td>" +
+                                "          </tr>" +
+
+                                "          <!-- Footer -->" +
+                                "          <tr>" +
+                                "            <td style='background:#f7f7f7; padding:14px; text-align:center; font-size:12px; color:#777777;'>" +
+                                "              © 2026 VASTA Bank. All rights reserved.<br>" +
+                                "              Secure • Transparent • Digital Banking" +
+                                "            </td>" +
+                                "          </tr>" +
+
+                                "        </table>" +
+
+                                "      </td>" +
+                                "    </tr>" +
+                                "  </table>" +
+
+                                "</body>" +
+                                "</html>";
 
 // Set Kafka or email event
                 event.setUsername(subject); // Email subject
@@ -267,43 +334,83 @@ public class AccountService {
 // Email subject
                 String subject = "💰 Amount Credited – ₹" + amount + " to your account";
 
-// HTML Email body
-                String body = "<!DOCTYPE html>" +
-                        "<html>" +
-                        "<head>" +
-                        "  <meta charset='UTF-8'>" +
-                        "  <style>" +
-                        "    body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }" +
-                        "    .container { background-color: #ffffff; padding: 20px; margin: 30px auto; width: 90%; max-width: 600px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }" +
-                        "    .header { background-color: #0046be; color: white; padding: 15px; border-radius: 10px 10px 0 0; text-align: center; }" +
-                        "    .logo { max-width: 100px; margin-bottom: 10px; }" +
-                        "    .content { padding: 20px; color: #333333; line-height: 1.6; }" +
-                        "    .footer { text-align: center; font-size: 12px; color: #888888; padding-top: 15px; }" +
-                        "    .highlight { font-weight: bold; color: #0046be; }" +
-                        "  </style>" +
-                        "</head>" +
-                        "<body>" +
-                        "  <div class='container'>" +
-                        "    <div class='header'>" +
-                        "      <img src='https://drive.google.com/file/d/13hFniB-moq7IQEjsqXJLRgUT9cfYqr9p/view?usp=drive_link' alt='EFB Logo' class='logo'>" +
-                        "      <h1>Amount Credited Successfully 💰</h1>" +
-                        "    </div>" +
-                        "    <div class='content'>" +
-                        "      <p>Hello <strong>" + fullname + "</strong>,</p>" +
-                        "      <p>The following transaction has been credited to your account <span class='highlight'>" + maskedAccount + "</span>:</p>" +
-                        "      <ul>" +
-                        "        <li>Amount Credited: <span class='highlight'>₹" + amount + "</span></li>" +
-                        "        <li>Current Balance: <span class='highlight'>₹" + account.getBalance() + "</span></li>" +
-                        "        <li>Date: " + formattedDate + "</li>" +
-                        "      </ul>" +
-                        "      <p>Thank you for banking with <strong>EFB – Equinox Finance Bank</strong>.</p>" +
-                        "    </div>" +
-                        "    <div class='footer'>" +
-                        "      &copy; 2025 EFB – Equinox Finance Bank. All rights reserved." +
-                        "    </div>" +
-                        "  </div>" +
-                        "</body>" +
-                        "</html>";
+                String body =
+                        "<!DOCTYPE html>" +
+                                "<html lang='en'>" +
+                                "<head>" +
+                                "  <meta charset='UTF-8'>" +
+                                "  <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+                                "  <title>VASTA Bank | Credit Alert</title>" +
+                                "</head>" +
+
+                                "<body style='margin:0; padding:0; background-color:#f4f6f9; font-family:Arial, Helvetica, sans-serif;'>" +
+
+                                "  <table width='100%' cellpadding='0' cellspacing='0'>" +
+                                "    <tr>" +
+                                "      <td align='center' style='padding:30px 10px;'>" +
+
+                                "        <table width='100%' cellpadding='0' cellspacing='0' style='max-width:600px; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(0,0,0,0.08);'>" +
+
+                                "          <!-- Header -->" +
+                                "          <tr>" +
+                                "            <td style='background:#0a3cff; padding:18px; text-align:center;'>" +
+                                "              <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:110px; margin-bottom:8px;'>" +
+                                "              <h2 style='color:#ffffff; margin:0; font-size:20px;'>Credit Transaction Alert</h2>" +
+                                "            </td>" +
+                                "          </tr>" +
+
+                                "          <!-- Content -->" +
+                                "          <tr>" +
+                                "            <td style='padding:24px; color:#333333; font-size:14.5px; line-height:1.6;'>" +
+
+                                "              <p>Dear <strong>" + fullname + "</strong>,</p>" +
+
+                                "              <p>An amount has been <strong>successfully credited</strong> to your VASTA Bank account.</p>" +
+
+                                "              <table width='100%' cellpadding='6' cellspacing='0' style='margin:15px 0; font-size:14px;'>" +
+                                "                <tr>" +
+                                "                  <td>Account Number</td>" +
+                                "                  <td style='font-weight:bold; text-align:right;'>" + maskedAccount + "</td>" +
+                                "                </tr>" +
+                                "                <tr>" +
+                                "                  <td>Amount Credited</td>" +
+                                "                  <td style='font-weight:bold; text-align:right;'>₹" + amount + "</td>" +
+                                "                </tr>" +
+                                "                <tr>" +
+                                "                  <td>Available Balance</td>" +
+                                "                  <td style='font-weight:bold; text-align:right;'>₹" + account.getBalance() + "</td>" +
+                                "                </tr>" +
+                                "                <tr>" +
+                                "                  <td>Transaction Date</td>" +
+                                "                  <td style='text-align:right;'>" + formattedDate + "</td>" +
+                                "                </tr>" +
+                                "              </table>" +
+
+                                "              <p>If you do not recognize this credit, please contact VASTA Bank support immediately.</p>" +
+
+                                "              <p style='margin-top:20px;'>Thank you for banking with <strong>VASTA Bank</strong>.</p>" +
+                                "              <p><strong>— Team VASTA</strong></p>" +
+
+                                "            </td>" +
+                                "          </tr>" +
+
+                                "          <!-- Footer -->" +
+                                "          <tr>" +
+                                "            <td style='background:#f7f7f7; padding:14px; text-align:center; font-size:12px; color:#777777;'>" +
+                                "              © 2026 VASTA Bank. All rights reserved.<br>" +
+                                "              Secure • Transparent • Digital Banking" +
+                                "            </td>" +
+                                "          </tr>" +
+
+                                "        </table>" +
+
+                                "      </td>" +
+                                "    </tr>" +
+                                "  </table>" +
+
+                                "</body>" +
+                                "</html>";
+
 
 // Set Kafka or email event
                 event.setUsername(subject); // Email subject
