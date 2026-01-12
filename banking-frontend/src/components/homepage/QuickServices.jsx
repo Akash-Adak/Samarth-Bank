@@ -13,7 +13,7 @@ const bankingProducts = {
       name: "Savings Account",
       description: "Start your savings journey with us",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/regular-saving?fmt=webp-alpha",
-      primaryAction: { label: "Open Now", link: "https://applyonline.hdfcbank.com/savings-account/insta-savings/open-instant-savings-account-online.html#nbb" },
+      primaryAction: { label: "Open Now", link: "" },
       secondaryAction: { label: "Know More", link: "/savings-account" },
       bgColor: "#73B8FF"
     },
@@ -30,7 +30,7 @@ const bankingProducts = {
       name: "Salary Account",
       description: "Manage your earnings, your way",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/salary-account-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Open Instantly", link: "https://applyonline.hdfcbank.com/savings-account/insta-savings/open-instant-savings-account-online.html#nbb" },
+      primaryAction: { label: "Open Instantly", link: "" },
       secondaryAction: { label: "Know More", link: "/salary-account" },
       bgColor: "#ECEDF3"
     },
@@ -47,7 +47,7 @@ const bankingProducts = {
       name: "Rural Account",
       description: "Unique savings accounts for farm support",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/rural-account-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Locate Us", link: "https://near-me.hdfcbank.com/branch-atm-locator/" },
+      primaryAction: { label: "Locate Us", link: "" },
       secondaryAction: { label: "Know More", link: "/agri-banking/rural-account" },
       bgColor: "#ECEDF3"
     }
@@ -58,7 +58,7 @@ const bankingProducts = {
       name: "Fixed Deposit",
       description: "A growth plan with peace of mind",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/fixed-deposit-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Quick Apply", link: "https://applyonline.hdfcbank.com/fixed-deposits/existing-customers-open-fd-online.html?LGCode=Mktg&mc_id=website_Organic_fd_deposits_sticky_cta&icid=website_Organic_fd_deposits_sticky_cta#nbb" },
+      primaryAction: { label: "Quick Apply", link: "" },
       secondaryAction: { label: "Learn More", link: "/fixed-deposit" },
       bgColor: "#73B8FF"
     },
@@ -75,7 +75,7 @@ const bankingProducts = {
       name: "Safe Deposit Locker",
       description: "Your Valuables, Securely Stored",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/safe-deposit-locker-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Get Your Locker", link: "https://near-me.hdfcbank.com/branch-atm-locator/" },
+      primaryAction: { label: "Get Your Locker", link: "" },
       secondaryAction: { label: "Learn More", link: "/safe-deposit-locker" },
       bgColor: "#73B8FF"
     }
@@ -86,7 +86,7 @@ const bankingProducts = {
       name: "Credit Card",
       description: "Explore a range of Credit Cards for every lifestyle",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/credit-card-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Apply Now", link: "https://applyonline.hdfcbank.com/cards/credit-cards.html?FUNC=FLOAT&LGcode=MKTG" },
+      primaryAction: { label: "Apply Now", link: "" },
       secondaryAction: { label: "Know More", link: "/credit-cards" },
       bgColor: "#73B8FF"
     },
@@ -95,7 +95,7 @@ const bankingProducts = {
       name: "Debit Card",
       description: "Simplify your spending with debit cards",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/debit-card-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Apply Now", link: "https://applyonline.hdfcbank.com/savings-account/insta-savings/open-instant-savings-account-online.html#nbb" },
+      primaryAction: { label: "Apply Now", link: "" },
       secondaryAction: { label: "Learn More", link: "/debit-cards" },
       bgColor: "#ECEDF3"
     },
@@ -104,7 +104,7 @@ const bankingProducts = {
       name: "Forex Card",
       description: "Easy-to-use forex cards",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/forex-card-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Explore Cards", link: "https://getprepaidcard.hdfcbank.com/index.aspx?mc_id=forex_card_cat_pg_sticky_cta&icid=forex_card_cat_pg_sticky_cta" },
+      primaryAction: { label: "Explore Cards", link: "" },
       secondaryAction: { label: "Know More", link: "/forex-cards" },
       bgColor: "#73B8FF"
     },
@@ -139,7 +139,7 @@ const bankingProducts = {
       name: "Personal Loan",
       description: "A loan for everything from dreams to emergencies",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/personal-loan-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Apply Online", link: "https://applyonline.hdfcbank.com/personal-loans.html?mc_id=website_organic_swiper_bankingsolutionstailormadeforyou_loans_personal_loan&icid=website_organic_swiper_bankingsolutionstailormadeforyou_loans_personal_loan" },
+      primaryAction: { label: "Apply Online", link: "" },
       secondaryAction: { label: "Learn More", link: "/personal-loan" },
       bgColor: "#73B8FF"
     },
@@ -148,7 +148,7 @@ const bankingProducts = {
       name: "Home Loan",
       description: "Own your dream home with our home loans",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/home-loan-updated?fmt=webp-alpha",
-      primaryAction: { label: "Quick Apply", link: "https://portal.hdfc.com/" },
+      primaryAction: { label: "Quick Apply", link: "" },
       secondaryAction: { label: "Explore", link: "/home-loan" },
       bgColor: "#ECEDF3"
     },
@@ -157,7 +157,7 @@ const bankingProducts = {
       name: "Car Loan",
       description: "Bring your dream wheels home",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/car-loan-updated?fmt=webp-alpha",
-      primaryAction: { label: "Get Funds", link: "https://applycarloan.hdfcbank.com/DiAL/#/loans" },
+      primaryAction: { label: "Get Funds", link: "" },
       secondaryAction: { label: "View More", link: "/car-loan" },
       bgColor: "#73B8FF"
     },
@@ -166,7 +166,7 @@ const bankingProducts = {
       name: "Business Loan",
       description: "Fuel your business growth with our loans",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/business-loan-desktop-1?fmt=webp-alpha",
-      primaryAction: { label: "Ready to Apply?", link: "https://v.hdfcbank.com/personal-business-loan.html" },
+      primaryAction: { label: "Ready to Apply?", link: "" },
       secondaryAction: { label: "Know More", link: "/business-loan" },
       bgColor: "#ECEDF3"
     },
@@ -175,7 +175,7 @@ const bankingProducts = {
       name: "Two Wheeler Loan",
       description: "Flexible 2-wheeler loans for everyone",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/two-wheeler-loan-updated?fmt=webp-alpha",
-      primaryAction: { label: "Apply Now", link: "https://applyonline.hdfcbank.com/two-wheeler-unified.html?mc_id=website_organic_swiper_bankingsolutionstailormadeforyou_loans_twowheeler_loan&icid=website_organic_swiper_bankingsolutionstailormadeforyou_loans_twowheeler_loan" },
+      primaryAction: { label: "Apply Now", link: "" },
       secondaryAction: { label: "View More", link: "/two-wheeler-loan" },
       bgColor: "#73B8FF"
     },
@@ -184,7 +184,7 @@ const bankingProducts = {
       name: "Gold Loan",
       description: "Turn your gold into possibilities",
       image: "https://s7ap1.scene7.com/is/image/hdfcbankPWS/gold-loan-desktop?fmt=webp-alpha",
-      primaryAction: { label: "Get Loan", link: "https://applyonline.hdfcbank.com/loan/gold-loan-form.html" },
+      primaryAction: { label: "Get Loan", link: "" },
       secondaryAction: { label: "Know More", link: "/gold-loan" },
       bgColor: "#ECEDF3"
     }

@@ -58,14 +58,14 @@ function CreditCardVisual() {
       <div className="relative w-full max-w-md aspect-[1.586/1] rounded-2xl bg-gradient-to-br from-gray-700 via-gray-900 to-black p-8 shadow-2xl border border-gray-600 transform hover:scale-105 transition-transform duration-500 group">
         <div className="flex justify-between items-start mb-12">
            <i className="fas fa-wifi text-gray-400 rotate-90 text-2xl"></i>
-           <span className="font-serif italic text-2xl text-gray-300">BankEase</span>
+           <span className="font-serif italic text-2xl text-gray-300">V Λ S T Λ</span>
         </div>
         <div className="space-y-1">
           <div className="text-xl tracking-[0.2em] font-mono text-gray-300">4588 22XX XXXX 9012</div>
           <div className="flex justify-between items-end mt-4">
             <div>
               <div className="text-[10px] text-gray-400 uppercase">Card Holder</div>
-              <div className="text-sm text-gray-200 font-medium">AKASH ADAK</div>
+              <div className="text-sm text-gray-200 font-medium">XXXX XXXX</div>
             </div>
             <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" className="h-10 opacity-80" alt="Mastercard" />
           </div>
