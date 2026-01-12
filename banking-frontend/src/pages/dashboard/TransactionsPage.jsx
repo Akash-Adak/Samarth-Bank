@@ -12,7 +12,7 @@ export default function TransactionsPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-
+const username=localStorage.getItem("username");
   const accountNumber = localStorage.getItem(`accountNumber-${username}`);
 
   // 🔥 LOAD TRANSACTIONS FROM BACKEND

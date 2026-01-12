@@ -2,10 +2,7 @@ package com.banking.loan.service;
 
 import com.banking.loan.model.*;
 import com.banking.loan.repository.LoanRepository;
-import com.banking.loan.response.AccountResponse;
-import com.banking.loan.response.LoanMsg;
-import com.banking.loan.response.User;
-import com.banking.loan.response.UserResponse;
+import com.banking.loan.response.*;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,9 +84,9 @@ public class LoanServiceImpl implements LoanService {
 
         Loan saved = loanRepository.save(loan);
 
-        // 📬 Notification
 
-//        User user = redisService.get(username, User.class);
+
+
 
         LoanMsg event = new LoanMsg();
         event.setEmail(loanRepository.findEmailByAccountNumber(req.getAccountNumber()));
@@ -108,16 +105,13 @@ public class LoanServiceImpl implements LoanService {
     public LoanResponseDto approveLoan(Long loanId,String username,String token) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
-
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        headers.setContentType(MediaType.APPLICATION_JSON);
         loan.setStatus(LoanStatus.APPROVED);
         loan.setStartDate(LocalDate.now());
         loan.setEndDate(LocalDate.now().plusMonths(loan.getTenureMonths()));
         loan.setUpdatedAt(LocalDate.now());
-
-        Loan saved = loanRepository.save(loan);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
@@ -129,6 +123,32 @@ public class LoanServiceImpl implements LoanService {
                 UserResponse.class,
                 username
         );
+
+        BigDecimal amount = loanRepository.findPrincipalAmountByLoanId(loanId)
+                .orElseThrow(() -> new IllegalStateException("Invalid loan"));
+
+        BalanceUpdateRequest dto =
+                new BalanceUpdateRequest(
+                        response.getBody().getAccountNumber(),
+                        amount
+                );
+        HttpEntity<BalanceUpdateRequest> entity1 =
+                new HttpEntity<>(dto, headers);
+
+        ResponseEntity<String> amountAddInAccount =
+                restTemplate.exchange(
+                        "http://ACCOUNT/api/accounts/credit",
+                        HttpMethod.POST,
+                        entity1,
+                        String.class
+                );
+
+
+
+        Loan saved = loanRepository.save(loan);
+
+
+
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw new RuntimeException("Account service validation failed");

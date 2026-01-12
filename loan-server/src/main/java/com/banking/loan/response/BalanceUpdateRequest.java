@@ -1,4 +1,5 @@
-package com.banking.account.model;
+package com.banking.loan.response;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

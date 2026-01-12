@@ -17,6 +17,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -46,7 +47,7 @@ public class AccountService {
         // Create new account
         Account account = new Account();
         account.setAccountNumber(generateBankAccountNumber());
-        account.setBalance(1000.0);
+        account.setBalance(BigDecimal.valueOf(1000.0));
         account.setUsername(username);
         account.setAccountType(String.valueOf(type));
         // ✅ Add proper headers
@@ -147,12 +148,13 @@ public class AccountService {
     }
 
 
-    public boolean debit(String accountNumber, Double amount,String token) {
+    public boolean debit(String accountNumber, BigDecimal amount,String token) {
         Optional<Account> optional = Optional.ofNullable(repository.findByAccountNumber(accountNumber));
         if (optional.isPresent()) {
             Account account = optional.get();
-            if (account.getBalance() >= amount) {
-                account.setBalance(account.getBalance() - amount);
+            if (account.getBalance().compareTo(amount) >= 0) {
+                account.setBalance(account.getBalance().subtract(amount));
+
                 repository.save(account);
 
                 HttpHeaders headers = new HttpHeaders();
@@ -231,9 +233,9 @@ public class AccountService {
         return false;
     }
 
-    public boolean credit(String accountNumber, Double amount, String token) {
+    public boolean credit(String accountNumber, BigDecimal amount, String token) {
         return Optional.ofNullable(repository.findByAccountNumber(accountNumber)).map(account -> {
-            account.setBalance(account.getBalance() + amount);
+            account.setBalance(account.getBalance().add(amount));
             repository.save(account);
 //            log.info("Credited ₹{} to account {}", amount, accountNumber);
 
@@ -322,7 +324,7 @@ public class AccountService {
     }
 
 
-    public double getBalanceByAccountNumber(String accountNumber) {
+    public BigDecimal getBalanceByAccountNumber(String accountNumber) {
         Account a= repository.findByAccountNumber(accountNumber);
         return a.getBalance();
     }

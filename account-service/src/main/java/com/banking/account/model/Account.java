@@ -3,6 +3,8 @@ package com.banking.account.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -25,7 +27,7 @@ public class Account {
         this.username = username;
     }
 
-    private Double balance;
+    private BigDecimal balance;
     private String username;
 
 
@@ -46,11 +48,11 @@ public class Account {
         this.accountNumber = accountNumber;
     }
 
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 }

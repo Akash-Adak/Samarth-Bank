@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 //@Slf4j
 @RestController
 @RequestMapping("/api/accounts")
@@ -67,8 +69,8 @@ public class AccountController {
     }
 
     @GetMapping("checkbalance/{accountNumber}")
-    public double checkBalance(@PathVariable String accountNumber){
-        double balance=accountService.getBalanceByAccountNumber(accountNumber);
+    public BigDecimal checkBalance(@PathVariable String accountNumber){
+        BigDecimal balance=accountService.getBalanceByAccountNumber(accountNumber);
         return balance;
     }
 

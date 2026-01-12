@@ -463,21 +463,7 @@ export default function Navbar() {
                                 </div>
                             </div>
                             
-                            {/* Quick Stats */}
-                            <div className="grid grid-cols-3 gap-2 px-4 py-3 border-b border-gray-50">
-                                <div className="text-center">
-                                    <div className="text-xs text-slate-500">Accounts</div>
-                                    <div className="text-sm font-bold text-slate-800">3</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-xs text-slate-500">Cards</div>
-                                    <div className="text-sm font-bold text-slate-800">2</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-xs text-slate-500">Loans</div>
-                                    <div className="text-sm font-bold text-slate-800">1</div>
-                                </div>
-                            </div>
+                            
 
                             {/* Menu Items */}
                             <div className="max-h-60 overflow-y-auto">

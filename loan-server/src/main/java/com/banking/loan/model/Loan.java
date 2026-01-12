@@ -120,7 +120,7 @@ public class Loan {
     @Column(nullable = false)
     private LoanType loanType;
 
-    @Column(nullable = false, precision = 15, scale = 2)
+    @Column(name = "principal_amount",nullable = false, precision = 15, scale = 2)
     private BigDecimal principalAmount;
 
     @Column(nullable = false)

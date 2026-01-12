@@ -8,6 +8,16 @@ public class UserResponse {
     private String username;// USER or ADMIN
     private String phone;
 
+    private String accountNumber;
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
     public String getUsername() {
         return username;
     }
