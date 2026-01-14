@@ -1,14 +1,11 @@
 package com.banking.loan.response;
 
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class BalanceUpdateRequest {
     private String accountNumber;
@@ -24,6 +21,11 @@ public class BalanceUpdateRequest {
 
     public BigDecimal getAmount() {
         return amount;
+    }
+
+    public BalanceUpdateRequest(String accountNumber, BigDecimal amount) {
+        this.accountNumber = accountNumber;
+        this.amount = amount;
     }
 
     public void setAmount(BigDecimal amount) {

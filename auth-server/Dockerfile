@@ -1,14 +1,13 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM gcr.io/distroless/java17-debian11
 
 WORKDIR /app
 
 COPY target/auth-server-0.0.1-SNAPSHOT.jar auth-service.jar
 
-# Create directories for keys
-RUN mkdir -p /etc/secrets && \
-    mkdir -p /app/config && \
-    chmod 700 /etc/secrets
+# Copy secrets/config instead of creating them
+COPY secrets /etc/secrets
+COPY config /app/config
 
 EXPOSE 8081
 
-ENTRYPOINT ["java", "-jar", "auth-service.jar"]
+CMD ["auth-service.jar"]

@@ -1,10 +1,12 @@
-FROM eclipse-temurin:17-jdk-alpine
+FROM gcr.io/distroless/java17-debian11
 
 WORKDIR /app
 
 COPY target/transaction-service-0.0.1-SNAPSHOT.jar transaction-service.jar
-RUN mkdir -p /app/config && \
-    chmod 755 /app/config
+
+# If you need config, COPY it (don’t create it)
+COPY config /app/config
+
 EXPOSE 8084
 
-ENTRYPOINT ["java", "-jar", "transaction-service.jar"]
+CMD ["transaction-service.jar"]

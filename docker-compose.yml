@@ -1,13 +1,15 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # MySQL Database
+  # =========================
+  # MySQL
+  # =========================
   mysql:
     image: mysql:8.0
     container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: banking_system
+      MYSQL_DATABASE: vasta_system
     ports:
       - "3308:3306"
     volumes:
@@ -19,9 +21,11 @@ services:
       timeout: 10s
       retries: 10
     networks:
-      - banking-network
+      - vasta-network
 
+  # =========================
   # Redis
+  # =========================
   redis:
     image: redis:7.2-alpine
     container_name: redis
@@ -29,32 +33,35 @@ services:
       - "6379:6379"
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
     networks:
-      - banking-network
+      - vasta-network
 
+  # =========================
   # Zookeeper
+  # =========================
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: zookeeper
-    ports:
-      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_4LW_COMMANDS_WHITELIST: "ruok,stat"
+    ports:
+      - "2181:2181"
     healthcheck:
-      test: ["CMD-SHELL", "echo > /dev/tcp/127.0.0.1/2181"]
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - banking-network
+      - vasta-network
 
+  # =========================
   # Kafka
+  # =========================
   kafka:
     image: confluentinc/cp-kafka:7.5.0
     container_name: kafka
@@ -67,151 +74,160 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     depends_on:
       zookeeper:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1"]
-      interval: 10s
-      timeout: 10s
-      retries: 5
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
-      - banking-network
+      - vasta-network
 
-  # Eureka Server
+  # =========================
+  # Eureka Server (Distroless)
+  # =========================
   eureka-server:
-    image: akta2910/banking-eureka:latest
+    image: akta2910/vasta-eureka:latest
     container_name: eureka-server
     ports:
       - "8761:8761"
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
     networks:
-      - banking-network
+      - vasta-network
 
-  # Auth Service
+  # =========================
+  # Auth Service (Distroless)
+  # =========================
   auth-service:
-    image: akta2910/banking-auth:latest
+    image: akta2910/vasta-auth:latest
     container_name: auth-service
-    ports:
-      - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+  # =========================
+  # User Service (Distroless)
+  # =========================
+  user-service:
+    image: akta2910/vasta-user:latest
+    container_name: user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8082:8082"
+    depends_on:
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+  # =========================
+  # Account Service (Distroless)
+  # =========================
+  account-service:
+    image: akta2910/vasta-account:latest
+    container_name: account-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8083:8083"
+    depends_on:
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+  # =========================
+  # Transaction Service (Distroless)
+  # =========================
+  transaction-service:
+    image: akta2910/vasta-transaction:latest
+    container_name: transaction-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8084:8084"
+    depends_on:
+      kafka:
+        condition: service_started
+      auth-service:
+        condition: service_started
+      eureka-server:
+        condition: service_started
+    networks:
+      - vasta-network
+
+  # =========================
+  # Loan Service (Distroless)
+  # =========================
+  loan-service:
+    image: akta2910/vasta-loan:latest
+    container_name: loan-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/vasta_loans?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8086:8086"
     depends_on:
       mysql:
         condition: service_healthy
       kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      eureka-server:
-        condition: service_healthy
-    networks:
-      - banking-network
-
-  # User Service
-  user-service:
-    image: akta2910/banking-user:latest
-    container_name: user-service
-    ports:
-      - "8082:8082"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      auth-service:
         condition: service_started
       eureka-server:
-        condition: service_healthy
-    networks:
-      - banking-network
-
-  # Account Service
-  account-service:
-    image: akta2910/banking-account:latest
-    container_name: account-service
-    ports:
-      - "8083:8083"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      auth-service:
         condition: service_started
-      eureka-server:
-        condition: service_healthy
     networks:
-      - banking-network
+      - vasta-network
 
-  # Transaction Service
-  transaction-service:
-    image: akta2910/banking-transaction:latest
-    container_name: transaction-service
-    ports:
-      - "8084:8084"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      auth-service:
-        condition: service_started
-      kafka:
-        condition: service_healthy
-      eureka-server:
-        condition: service_healthy
-    networks:
-      - banking-network
-
-  loan-service:
-    build:
-      context: ./loan-service
-      dockerfile: Dockerfile
-    container_name: loan-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/banking_loans?createDatabaseIfNotExist=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-    depends_on:
-      - mysql
-      - kafka
-      - eureka-server
-    ports:
-      - "8086:8086"
-    networks:
-      - banking-net
-
-
-  # Notification Service
+  # =========================
+  # Notification Service (Distroless)
+  # =========================
   notification-service:
-    image: akta2910/banking-notify:latest
+    image: akta2910/vasta-notify:latest
     container_name: notification-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8085:8085"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
     depends_on:
+      kafka:
+        condition: service_started
       auth-service:
         condition: service_started
-      kafka:
-        condition: service_healthy
       eureka-server:
-        condition: service_healthy
+        condition: service_started
     networks:
-      - banking-network
+      - vasta-network
 
+# =========================
 # Volumes
+# =========================
 volumes:
   mysql_data:
   kafka_data:
 
+# =========================
 # Network
+# =========================
 networks:
-  banking-network:
+  vasta-network:
     driver: bridge

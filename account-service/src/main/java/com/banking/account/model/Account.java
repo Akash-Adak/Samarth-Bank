@@ -19,6 +19,7 @@ public class Account {
     private String accountNumber;
 
     private String accountType;
+
     public String getUsername() {
         return username;
     }
@@ -39,6 +40,13 @@ public class Account {
         this.id = id;
     }
 
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public void setAccountType(String accountType) {
+        this.accountType = accountType;
+    }
 
     public String getAccountNumber() {
         return accountNumber;

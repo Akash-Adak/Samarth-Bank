@@ -1,12 +1,9 @@
-FROM eclipse-temurin:17-jdk-alpine
-
-
+FROM gcr.io/distroless/java17-debian11
 
 WORKDIR /app
 
 COPY target/notification-service-0.0.1-SNAPSHOT.jar notification-service.jar
 
-
 EXPOSE 8085
 
-ENTRYPOINT ["java", "-jar", "notification-service.jar"]
+CMD ["notification-service.jar"]

@@ -1,13 +1,13 @@
 package com.banking.account.model;
 
 public class AccountRequest {
-    private AccountType type;  // ✅ Enum instead of String
+    private String type;  // ✅ Enum instead of String
 
-    public AccountType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(AccountType type) {
+    public void setType(String type) {
         this.type = type;
     }
 }

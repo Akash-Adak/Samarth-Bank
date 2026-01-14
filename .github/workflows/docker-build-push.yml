@@ -14,19 +14,19 @@ jobs:
       matrix:
         include:
           - service: eureka-server
-            image: banking-eureka
+            image: vasta-eureka
           - service: auth-server
-            image: banking-auth
+            image: vasta-auth
           - service: account-service
-            image: banking-account
+            image: vasta-account
           - service: user-service
-            image: banking-user
+            image: vasta-user
           - service: transaction-server
-            image: banking-transaction
+            image: vasta-transaction
           - service: notification-server
-            image: banking-notify
+            image: vasta-notify
           - service: loan-server
-            image: banking-loan
+            image: vasta-loan
 
     steps:
       # Step 1: Checkout code
@@ -69,4 +69,3 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:latest
-            ${{ secrets.DOCKER_USERNAME }}/${{ matrix.image }}:${{ env.sha_short }}

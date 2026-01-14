@@ -39,7 +39,7 @@ public class AccountService {
 
     @Autowired
     private RedisService redisService;
-    public Account createAccount(String username, String token, AccountType type) {
+    public Account createAccount(String username, String token, String type) {
 
         // Check if user already has an account
         if (repository.findByUsername(username).isPresent()) return null;
@@ -49,7 +49,7 @@ public class AccountService {
         account.setAccountNumber(generateBankAccountNumber());
         account.setBalance(BigDecimal.valueOf(1000.0));
         account.setUsername(username);
-        account.setAccountType(String.valueOf(type));
+        account.setAccountType(type);
         // ✅ Add proper headers
         HttpHeaders headers = new HttpHeaders();
 //        headers.setContentType(MediaType.APPLICATION_JSON);
