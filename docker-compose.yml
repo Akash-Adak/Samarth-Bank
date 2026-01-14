@@ -105,6 +105,9 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8081:8081"
+    volumes:
+      - ./secrets:/etc/secrets:ro
+      - ./config:/app/config:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -117,6 +120,7 @@ services:
     networks:
       - vasta-network
 
+
   # =========================
   # User Service (Distroless)
   # =========================
@@ -125,6 +129,8 @@ services:
     container_name: user-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
     ports:
       - "8082:8082"
     depends_on:
@@ -143,6 +149,8 @@ services:
     container_name: account-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
     ports:
       - "8083:8083"
     depends_on:
@@ -161,6 +169,8 @@ services:
     container_name: transaction-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
     ports:
       - "8084:8084"
     depends_on:
@@ -186,6 +196,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    volumes:
+      - ./config:/app/config:ro
     ports:
       - "8086:8086"
     depends_on:
@@ -206,6 +218,8 @@ services:
     container_name: notification-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - ./config:/app/config:ro
     ports:
       - "8085:8085"
     depends_on:

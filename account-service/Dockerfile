@@ -3,7 +3,6 @@ FROM gcr.io/distroless/java17-debian11
 WORKDIR /app
 
 COPY target/account-service-0.0.1-SNAPSHOT.jar account-server.jar
-COPY config /app/config
 
 EXPOSE 8083
 

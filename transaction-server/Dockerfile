@@ -4,8 +4,6 @@ WORKDIR /app
 
 COPY target/transaction-service-0.0.1-SNAPSHOT.jar transaction-service.jar
 
-# If you need config, COPY it (don’t create it)
-COPY config /app/config
 
 EXPOSE 8084
 
