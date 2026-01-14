@@ -178,7 +178,7 @@ public class LoanServiceImpl implements LoanService {
                 "<body>" +
                 "  <div class='container'>" +
                 "    <div class='header'>" +
-                "      <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' class='logo'>" +
+                "      <img src='assets/vasta-bank-logo.png' alt='VASTA Bank Logo' class='logo'>" +
                 "      <h1>Loan Approved ✔️</h1>" +
                 "    </div>" +
                 "    <div class='content'>" +

@@ -102,7 +102,7 @@ public class AccountService {
                         "          <!-- Header -->" +
                         "          <tr>" +
                         "            <td style='background:#0a3cff; padding:20px; text-align:center;'>" +
-                        "              <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:120px; margin-bottom:10px;'>" +
+                        "              <img src='assets/vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:120px; margin-bottom:10px;'>" +
                         "              <h1 style='color:#ffffff; margin:0; font-size:22px;'>Welcome to VASTA Bank</h1>" +
                         "            </td>" +
                         "          </tr>" +
@@ -227,7 +227,7 @@ public class AccountService {
                                 "          <!-- Header -->" +
                                 "          <tr>" +
                                 "            <td style='background:#0a3cff; padding:18px; text-align:center;'>" +
-                                "              <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:110px; margin-bottom:8px;'>" +
+                                "              <img src='assets/vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:110px; margin-bottom:8px;'>" +
                                 "              <h2 style='color:#ffffff; margin:0; font-size:20px;'>Debit Transaction Alert</h2>" +
                                 "            </td>" +
                                 "          </tr>" +
@@ -354,7 +354,7 @@ public class AccountService {
                                 "          <!-- Header -->" +
                                 "          <tr>" +
                                 "            <td style='background:#0a3cff; padding:18px; text-align:center;'>" +
-                                "              <img src='vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:110px; margin-bottom:8px;'>" +
+                                "              <img src='assets/vasta-bank-logo.png' alt='VASTA Bank Logo' style='max-width:110px; margin-bottom:8px;'>" +
                                 "              <h2 style='color:#ffffff; margin:0; font-size:20px;'>Credit Transaction Alert</h2>" +
                                 "            </td>" +
                                 "          </tr>" +

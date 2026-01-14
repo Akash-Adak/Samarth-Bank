@@ -129,7 +129,7 @@ docker-compose down
 ## 🏗️ Backend Architecture (Microservices)
 
 <p align="center">
-  <img src="assets/architecture-diagram.png" />
+  <img src="assets/structure.png" />
 </p>
 
 ### Core Services
@@ -160,11 +160,11 @@ docker-compose down
 
 ## 📡 Event-Driven System (Kafka)
 
-[//]: # (<p align="center">)
+<p align="center">
 
-[//]: # (  <img src="assets/kafka-flow.png" />)
+  <img src="assets/kafka.png" />
 
-[//]: # (</p>)
+</p>
 
 Kafka topics used:
 
@@ -206,11 +206,11 @@ Kafka topics used:
 
 ## 🐳 DevOps & Deployment
 
-[//]: # (<p align="center">)
+<p align="center">
 
-[//]: # (  <img src="assets/docker-compose.png" />)
+  <img src="assets/devops.png" />
 
-[//]: # (</p>)
+</p>
 
 * Dockerized microservices
 * One-command startup
