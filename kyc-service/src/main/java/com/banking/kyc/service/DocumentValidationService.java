@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class DocumentValidationService {
 
 
-    
+
 
     public KycFeatures generateFeatures(
             DocumentType docType,
