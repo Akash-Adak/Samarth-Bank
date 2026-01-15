@@ -56,4 +56,31 @@ public class KycTestController {
 
         return "Score = " + score;
     }
+
+    @GetMapping("/test-name-dob")
+    public String testNameDob() {
+
+        String ocrText =
+                "INCOME TAX DEPARTMENT\n" +
+                        "Name: RAHUL SHARMA\n" +
+                        "DOB: 12/08/1999\n" +
+                        "PAN: ABCDE1234F";
+
+        KycFeatures features =
+                validationService.generateFeatures(
+                        DocumentType.PAN,
+                        "Rahul Sharma",
+                        "1999-08-12",
+                        "ABCDE1234F",
+                        ocrText,
+                        85
+                );
+
+        int score = aiScoringService.calculateScore(features);
+
+        return "Score=" + score +
+                " NameSimilarity=" + features.getNameSimilarity() +
+                " DobMatch=" + features.isDobMatch();
+    }
+
 }
