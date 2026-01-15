@@ -31,6 +31,7 @@
         <module>auth-server</module>
         <module>eureka-server</module>
 		<module>loan-server</module>
+		<module>kyc-service</module>
 
 
 	</modules>

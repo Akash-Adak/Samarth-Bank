@@ -1,14 +1,11 @@
-package com.banking.loan;
+package com.banking.kyc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
 
-@EnableCaching
 @SpringBootApplication
-public class LoanApplication {
+public class KycApplication {
     public static void main(String[] args) {
-
-        SpringApplication.run(LoanApplication.class, args);
+        SpringApplication.run(KycApplication.class, args);
     }
 }
