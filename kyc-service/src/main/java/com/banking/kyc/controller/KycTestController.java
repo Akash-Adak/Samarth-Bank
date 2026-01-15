@@ -1,8 +1,10 @@
 package com.banking.kyc.controller;
 
 import com.banking.kyc.dto.KycFeatures;
+import com.banking.kyc.enums.DocumentType;
 import com.banking.kyc.enums.KycStatus;
 import com.banking.kyc.service.AiScoringService;
+import com.banking.kyc.service.DocumentValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +34,26 @@ public class KycTestController {
                 score >= 80 ? KycStatus.VERIFIED : KycStatus.REJECTED;
 
         return "AI Score = " + score + " | Status = " + status;
+    }
+
+    @Autowired
+    private DocumentValidationService validationService;
+
+    @GetMapping("/test-doc")
+    public String testDocumentValidation() {
+
+        KycFeatures features =
+                validationService.generateFeatures(
+                        DocumentType.PAN,
+                        "Rahul Sharma",
+                        "1999-08-12",
+                        "ABCDE1234F",
+                        "INCOME TAX DEPARTMENT GOVT OF INDIA PAN",
+                        85
+                );
+
+        int score = aiScoringService.calculateScore(features);
+
+        return "Score = " + score;
     }
 }
