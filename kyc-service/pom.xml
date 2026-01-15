@@ -68,6 +68,14 @@
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
+
+<!--        ocr-->
+        <dependency>
+            <groupId>net.sourceforge.tess4j</groupId>
+            <artifactId>tess4j</artifactId>
+            <version>5.11.0</version>
+        </dependency>
+
         <!-- Test -->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->
