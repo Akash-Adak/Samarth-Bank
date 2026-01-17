@@ -1,8 +1,5 @@
 package com.banking.kyc.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
 import com.banking.kyc.dto.*;
 import com.banking.kyc.enums.DocumentType;
 import com.banking.kyc.enums.KycStatus;
@@ -12,37 +9,57 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 @RestController
 @RequestMapping("/api/kyc")
 public class KycController {
 
-    @Autowired
-    private OcrService ocrService;
+    private final OcrService ocrService;
+    private final DocumentValidationService validationService;
+    private final AiScoringService aiScoringService;
 
     @Autowired
-    private DocumentValidationService validationService;
+    public KycController(
+            OcrService ocrService,
+            DocumentValidationService validationService,
+            AiScoringService aiScoringService
+    ) {
+        this.ocrService = ocrService;
+        this.validationService = validationService;
+        this.aiScoringService = aiScoringService;
+    }
 
-    @Autowired
-    private AiScoringService aiScoringService;
-
-    @PostMapping(value = "/verify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(
+            value = "/verify",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public KycResponse verifyKyc(
             @RequestPart("data") String data,
             @RequestPart("image") MultipartFile image
     ) throws Exception {
 
-        // 1️⃣ Parse JSON safely
+        // 🔐 1️⃣ Get authenticated user from JWT
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String userId = auth.getName(); // usually userId / email
+
+        // 2️⃣ Parse request safely
         ObjectMapper mapper = new ObjectMapper();
         KycRequest request = mapper.readValue(data, KycRequest.class);
 
-        // 2️⃣ Normalize document type (CRITICAL FIX)
+        // 3️⃣ Normalize document type
         DocumentType documentType =
                 DocumentType.valueOf(request.getDocumentType().toUpperCase());
 
-        // 3️⃣ Save image temporarily (safe extension handling)
+        // 4️⃣ Save image temporarily
         String originalName = image.getOriginalFilename();
         String ext = (originalName != null && originalName.contains("."))
                 ? originalName.substring(originalName.lastIndexOf("."))
@@ -53,11 +70,11 @@ public class KycController {
             fos.write(image.getBytes());
         }
 
-        // 4️⃣ OCR
+        // 5️⃣ OCR
         OcrResult ocrResult = ocrService.extractText(tempFile);
         tempFile.delete();
 
-        // 5️⃣ Generate AI features
+        // 6️⃣ Generate AI features
         KycFeatures features =
                 validationService.generateFeatures(
                         documentType,
@@ -68,25 +85,15 @@ public class KycController {
                         ocrResult.getConfidence()
                 );
 
-        // 🔍 DEBUG LOGS (VERY IMPORTANT)
-        System.out.println("----- KYC DEBUG -----");
-        System.out.println("DOC TYPE   : " + documentType);
-        System.out.println("OCR CONF   : " + features.getOcrConfidence());
-        System.out.println("STRUCTURE : " + features.isValidStructure());
-        System.out.println("NAME SIM  : " + features.getNameSimilarity());
-        System.out.println("DOB MATCH : " + features.isDobMatch());
-        System.out.println("KEYWORDS  : " + features.getKeywordScore());
-        System.out.println("REGISTRY  : " + features.isRegistryMatch());
-        System.out.println("---------------------");
-
-        // 6️⃣ AI scoring
+        // 7️⃣ AI scoring
         int score = aiScoringService.calculateScore(features);
 
-        // 🔧 DEMO-FRIENDLY THRESHOLD (FIX)
+        // 8️⃣ Final decision
         KycStatus status =
                 score >= 65 ? KycStatus.VERIFIED : KycStatus.REJECTED;
 
-        // 7️⃣ Response
+        // (Kafka event can be added here later)
+
         return new KycResponse(
                 status.name(),
                 score,
