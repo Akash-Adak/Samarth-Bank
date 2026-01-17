@@ -5,6 +5,7 @@ import com.banking.kyc.enums.DocumentType;
 import com.banking.kyc.enums.KycStatus;
 import com.banking.kyc.service.AiScoringService;
 import com.banking.kyc.service.DocumentValidationService;
+import com.banking.kyc.service.RegistryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +15,9 @@ public class KycTestController {
 
     @Autowired
     private AiScoringService aiScoringService;
+    @Autowired
+   private RegistryService registryService;
+
 
     @GetMapping("/test-ai")
     public String testAi() {
@@ -47,7 +51,7 @@ public class KycTestController {
                         DocumentType.PAN,
                         "Rahul Sharma",
                         "1999-08-12",
-                        "ABCDE1234F",
+                        "APSDE1234F",
                         "INCOME TAX DEPARTMENT GOVT OF INDIA PAN",
                         85
                 );
@@ -82,5 +86,20 @@ public class KycTestController {
                 " NameSimilarity=" + features.getNameSimilarity() +
                 " DobMatch=" + features.isDobMatch();
     }
+
+    @GetMapping("/test-registry")
+    public String testRegistry() {
+
+        boolean result =
+                registryService.isIdentityValid(
+                        "PAN",
+                        "ABCDE1234F",
+                        "Rahul Sharma",
+                        "1999-08-12"
+                );
+
+        return "Registry Match = " + result;
+    }
+
 
 }

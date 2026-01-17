@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class DocumentValidationService {
 
+    @Autowired
+    private RegistryService registryService;
 
 
 
@@ -47,13 +49,21 @@ public class DocumentValidationService {
         boolean dobMatch =
                 DobMatcher.match(typedDob, ocrDob);
 
+        boolean registryMatch =
+                registryService.isIdentityValid(
+                        docType.name(),
+                        typedDocNumber,
+                        typedName,
+                        typedDob
+                );
+
         return KycFeatures.builder()
                 .ocrConfidence(ocrConfidence)
                 .validStructure(validStructure)
                 .nameSimilarity(nameSimilarity)
                 .dobMatch(dobMatch)
                 .keywordScore(keywordScore)
-                .registryMatch(true) // fake registry next step
+                .registryMatch(registryMatch)
                 .build();
     }
 
