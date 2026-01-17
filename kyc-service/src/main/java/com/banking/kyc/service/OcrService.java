@@ -18,19 +18,13 @@ public class OcrService {
         try {
             ITesseract tesseract = new Tesseract();
 
-            // 🔴 IMPORTANT: Set datapath
-            // Linux:
-//            tesseract.setDatapath("/usr/share/tesseract-ocr/4.00/tessdata");
 
-            // Windows (example):
              tesseract.setDatapath("C:/Program Files/Tesseract-OCR/tessdata");
 
             tesseract.setLanguage("eng");
 
             String text = tesseract.doOCR(imageFile);
 
-            // Tess4J doesn't give true confidence easily,
-            // so we simulate a realistic confidence
             int confidence = calculateConfidence(text);
 
             return new OcrResult(text, confidence);
