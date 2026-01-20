@@ -24,7 +24,7 @@ public class KycController {
             value = "/verify",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public KycResponse verifyKyc(@RequestPart("data") String data, @RequestPart("image") MultipartFile image , HttpServletRequest request) throws KycVerificationService.KycProcessingException {
+    public KycResponse verifyKyc(@RequestPart("data") String data, @RequestPart("image") MultipartFile image , HttpServletRequest request) throws KycVerificationService {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         String token = request.getHeader("Authorization"); // Get the token from incoming request
