@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class KycRequest {
 
-    private Long userId;
+    private String email;
     private String documentType;     // PAN / AADHAAR
     private String name;
     private String dob;              // yyyy-MM-dd
