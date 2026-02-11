@@ -1,9 +1,13 @@
 package com.banking.user.service;
 
+import com.banking.user.model.IdentityRegistry;
 import com.banking.user.model.User;
+import com.banking.user.model.UserModel;
 import com.banking.user.repository.UserRepository;
 import com.banking.user.response.RegisterRequestResponse;
+
 import com.google.gson.Gson;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -25,11 +30,44 @@ public class UserService {
     private UserRepository userRepository;
     @Autowired
     private  KafkaProducerService kafkaProducerService;
+    @Autowired
+    private RestTemplate restTemplate;
 
 
-    public User createUser(User user) {
+    public User createUser(UserModel userModel, HttpServletRequest request) {
+        User user= new User();
+        user.setUsername(userModel.getUsername());
+        user.setEmail(userModel.getEmail());
+        user.setAddress(userModel.getAddress());
+        user.setPhone(userModel.getPhone());
+        user.setKycStatus(userModel.getKycStatus());
+        user.setFullname(userModel.getFullname());
+
+        IdentityRegistry identityRegistry = new IdentityRegistry();
+        identityRegistry.setDob(userModel.getDob());
+
+        identityRegistry.setDocHash(userModel.getDocHash());
+
+        identityRegistry.setDocType(userModel.getDocType());
+        identityRegistry.setFullName(userModel.getFullname());
+        String token = request.getHeader("Authorization");
+        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization" , token);
+
+        HttpEntity<IdentityRegistry> entity = new HttpEntity<>(identityRegistry, headers);
+
+        ResponseEntity<IdentityRegistry> response = restTemplate.exchange(
+                "http://KYC/api/kyc/addUserData",
+                HttpMethod.POST,
+                entity,
+                IdentityRegistry.class
+        );
 
 
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new RuntimeException("Failed to update user with account number");
+        }
         return userRepository.save(user);
     }
 
@@ -39,17 +77,39 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public User UpdateUser(User user) {
-            User old=userRepository.findByUsername(user.getUsername()).orElseThrow();
-            old.setEmail(user.getEmail());
-            old.setAddress(user.getAddress());
-            old.setPhone(user.getPhone());
-            old.setKycStatus(user.getKycStatus());
-            old.setFullname(user.getFullname());
+    public User UpdateUser(UserModel userModel,HttpServletRequest request) {
 
+            User old=userRepository.findByUsername(userModel.getUsername()).orElseThrow();
+            old.setEmail(userModel.getEmail());
+            old.setAddress(userModel.getAddress());
+            old.setPhone(userModel.getPhone());
+            old.setKycStatus(userModel.getKycStatus());
+            old.setFullname(userModel.getFullname());
+
+        IdentityRegistry identityRegistry = new IdentityRegistry();
+        identityRegistry.setDob(userModel.getDob());
+
+        identityRegistry.setDocHash(userModel.getDocHash());
+
+        identityRegistry.setDocType(userModel.getDocType());
+        identityRegistry.setFullName(userModel.getFullname());
+        identityRegistry.setId(userModel.getId());
+        String token = request.getHeader("Authorization");
+        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization" , token);
+
+        HttpEntity<IdentityRegistry> entity = new HttpEntity<>(identityRegistry, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "http://KYC/api/kyc/addUserData",
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
         RegisterRequestResponse event = new RegisterRequestResponse();
-        String fullname = user.getUsername();
-        String email = user.getEmail();
+        String fullname = userModel.getUsername();
+        String email = userModel.getEmail();
         String subject = "✅ Your Account Details Updated Successfully";
 
 // HTML Email body
@@ -118,4 +178,7 @@ public class UserService {
 
         return userRepository.findByAccountNumber(accountNumber);
     }
+
+
+
 }

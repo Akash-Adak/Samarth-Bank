@@ -2,8 +2,10 @@ package com.banking.user.controller;
 
 //import com.banking.user.kafka.KafkaProducer;
 import com.banking.user.model.User;
+import com.banking.user.model.UserModel;
 import com.banking.user.service.RedisService;
 import com.banking.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -26,7 +28,7 @@ public class UserController {
     private RedisService redisService;
 
     @PostMapping("/create-user")
-    public ResponseEntity<?> createUser(@RequestBody User user) {
+    public ResponseEntity<?> createUser(@RequestBody UserModel user, HttpServletRequest request) {
 
         String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -34,7 +36,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("You cannot create a user for someone else.");
         }
-       User saved= userService.createUser(user);
+       User saved= userService.createUser(user,request);
         return new ResponseEntity<>(saved,HttpStatus.CREATED);
     }
 
@@ -66,15 +68,15 @@ public class UserController {
 
 
     @PutMapping
-    public ResponseEntity<?> UpdateUser(@RequestBody User user) {
+    public ResponseEntity<?> UpdateUser(@RequestBody UserModel userModel,HttpServletRequest request) {
         String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        if (!jwtUsername.equals(user.getUsername())) {
+        if (!jwtUsername.equals(userModel.getUsername())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("You cannot create a user for someone else.");
         }
 
-        User saved= userService.UpdateUser(user);
+        User saved= userService.UpdateUser(userModel,request);
 
 
         User cachedUser = redisService.get(saved.getUsername(), User.class);

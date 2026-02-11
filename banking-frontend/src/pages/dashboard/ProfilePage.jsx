@@ -16,6 +16,9 @@ export default function ProfilePage() {
     address: "",
     accountNumber: "",
     kycStatus: "",
+    dob:"",
+    docType:"",
+    docHash:""
   });
 
   const [loading, setLoading] = useState(true);
@@ -65,6 +68,9 @@ export default function ProfilePage() {
         address: profile.address,
         accountNumber: profile.accountNumber,
         kycStatus: profile.kycStatus,
+        dob:profile.dob,
+    docType:profile.docType,
+    docHash:profile.docHash
       });
 
       setIsEditing(false);
@@ -219,6 +225,36 @@ export default function ProfilePage() {
                 value={profile.address}
                 onChange={(e) =>
                   setProfile({ ...profile, address: e.target.value })
+                }
+              />
+              <input
+                type="date"
+                placeholder="date of birth"
+                className="border p-3 rounded-lg"
+                value={profile.dob}
+                onChange={(e) =>
+                  setProfile({ ...profile, dob: e.target.value })
+                }
+              />
+             <select
+              className="border p-3 rounded-lg"
+              value={profile.docType}
+              onChange={(e) =>
+                setProfile({ ...profile, docType: e.target.value })
+              }
+            >
+              <option value="">Select Document Type</option>
+              <option value="AADHAAR">AADHAAR</option>
+              <option value="PAN">PAN</option>
+            </select>
+
+              <input
+                type="text"
+                placeholder="docNumber"
+                className="border p-3 rounded-lg"
+                value={profile.docHash}
+                onChange={(e) =>
+                  setProfile({ ...profile, docHash: e.target.value })
                 }
               />
             </div>

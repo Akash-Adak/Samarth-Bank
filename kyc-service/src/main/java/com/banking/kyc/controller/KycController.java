@@ -1,6 +1,7 @@
 package com.banking.kyc.controller;
 
 import com.banking.kyc.dto.KycResponse;
+import com.banking.kyc.entity.IdentityRegistry;
 import com.banking.kyc.service.KycVerificationService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,5 +32,14 @@ public class KycController {
 
 
         return kycVerificationService.verifyKyc(username,token, data, image);
+    }
+    @PostMapping("/addUserData")
+    public String addUserData( @RequestBody IdentityRegistry registry, HttpServletRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (username.equals(null)) {
+            return "You cannot add data ";
+        }
+
+        return kycVerificationService.addUserData( registry);
     }
 }

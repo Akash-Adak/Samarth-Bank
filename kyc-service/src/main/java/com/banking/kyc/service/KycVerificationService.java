@@ -1,9 +1,11 @@
 package com.banking.kyc.service;
 
 import com.banking.kyc.dto.*;
+import com.banking.kyc.entity.IdentityRegistry;
 import com.banking.kyc.enums.DocumentType;
 import com.banking.kyc.enums.KycStatus;
 
+import com.banking.kyc.repository.IdentityRegistryRepository;
 import com.banking.kyc.response.KycRequestResponse;
 import com.banking.kyc.util.EmailTemplateUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,30 +17,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.security.MessageDigest;
 import java.util.Map;
 
 @Service
 public class KycVerificationService extends Throwable {
 
-    private final OcrService ocrService;
-    private final DocumentValidationService validationService;
-    private final AiScoringService aiScoringService;
-    private final KafkaProducerService kafkaProducerService;
-    private final EmailTemplateUtil emailTemplateUtil;
+    @Autowired
+    private  OcrService ocrService;
+    @Autowired
+    private  DocumentValidationService validationService;
+    @Autowired
+    private  AiScoringService aiScoringService;
+    @Autowired
+    private  KafkaProducerService kafkaProducerService;
+    @Autowired
+    private  EmailTemplateUtil emailTemplateUtil;
+    @Autowired
+    private  IdentityRegistryRepository registryRepository;
 
-    public KycVerificationService(
-            OcrService ocrService,
-            DocumentValidationService validationService,
-            AiScoringService aiScoringService,
-            KafkaProducerService kafkaProducerService,
-            EmailTemplateUtil emailTemplateUtil
-    ) {
-        this.ocrService = ocrService;
-        this.validationService = validationService;
-        this.aiScoringService = aiScoringService;
-        this.kafkaProducerService = kafkaProducerService;
-        this.emailTemplateUtil = emailTemplateUtil;
-    }
+
 
     public KycResponse verifyKyc(
             String username,
@@ -137,4 +135,32 @@ public class KycVerificationService extends Throwable {
         }
         return tempFile;
     }
+
+    public String addUserData(IdentityRegistry registry) {
+        // This method can be used to store the extracted KYC data in a database
+        // For this example, we will just return a success message
+        registry.setDocHash(sha256(registry.getDocHash()));
+        registry.setStatus("ACTIVE");
+
+        registryRepository.save(registry);
+        return "KYC data  has been stored successfully.";
+    }
+
+
+        public  String sha256(String input) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hash = md.digest(input.getBytes());
+
+                StringBuilder hex = new StringBuilder();
+                for (byte b : hash) {
+                    hex.append(String.format("%02x", b));
+                }
+                return hex.toString();
+
+            } catch (Exception e) {
+                throw new RuntimeException("Hashing failed");
+            }
+        }
+
 }
