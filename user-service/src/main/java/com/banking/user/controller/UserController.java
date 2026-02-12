@@ -70,12 +70,12 @@ public class UserController {
     @PutMapping
     public ResponseEntity<?> UpdateUser(@RequestBody UserModel userModel,HttpServletRequest request) {
         String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
+        String username=userModel.getUsername();
         if (!jwtUsername.equals(userModel.getUsername())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("You cannot create a user for someone else.");
         }
-
+        System.out.println("from user controller"+userModel);
         User saved= userService.UpdateUser(userModel,request);
 
 
@@ -123,6 +123,17 @@ public class UserController {
 
        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
+@PatchMapping("/{username}/updateKycStatus/{kycStatus}")
+public ResponseEntity<?> updateKycStatus(@PathVariable String username,@PathVariable String kycStatus){
+        User u= userService.updateKycStatus(username,kycStatus);
+//        User cachedUser = redisService.get(u.getUsername(), User.class); if (cachedUser != null) {
+//            Optional<User> users = userService.getUserByUsername(u.getUsername());
+//            if (users.isPresent()) { User userObj = users.get();
+//                redisService.set(u.getUsername(), userObj, 3600L);
+//                return new ResponseEntity<>(userObj, HttpStatus.OK);
+//            }
+//        }
+        return ResponseEntity.ok(u);
+    }
 
 }

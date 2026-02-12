@@ -1,7 +1,9 @@
 package com.banking.account.service;
 
 import com.banking.account.model.Account;
+import com.banking.account.model.AccountRequest;
 import com.banking.account.model.AccountType;
+import com.banking.account.model.IdentityRegistry;
 import com.banking.account.repository.AccountRepository;
 import com.banking.account.response.RegisterRequestResponse;
 import com.banking.account.response.UserResponse;
@@ -39,7 +41,7 @@ public class AccountService {
 
     @Autowired
     private RedisService redisService;
-    public Account createAccount(String username, String token, String type) {
+    public Account createAccount(String username, String token, AccountRequest accountRequest) {
 
         // Check if user already has an account
         if (repository.findByUsername(username).isPresent()) return null;
@@ -49,23 +51,29 @@ public class AccountService {
         account.setAccountNumber(generateBankAccountNumber());
         account.setBalance(BigDecimal.valueOf(1000.0));
         account.setUsername(username);
-        account.setAccountType(type);
+        account.setAccountType(accountRequest.getType());
         // ✅ Add proper headers
+        IdentityRegistry identityRegistry = new IdentityRegistry();
+        identityRegistry.setFullname(accountRequest.getFullname());
+        identityRegistry.setDob(accountRequest.getDob());
+        identityRegistry.setDocHash(accountRequest.getDocHash());
+        identityRegistry.setDocType(accountRequest.getDocType());
+        identityRegistry.setAccountNumber(account.getAccountNumber());
+        identityRegistry.setUsername(username);
         HttpHeaders headers = new HttpHeaders();
 //        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization" , token);
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        HttpEntity<IdentityRegistry> entity = new HttpEntity<>(identityRegistry,headers);
 
         // ✅ Update user with new account number
 
         ResponseEntity<UserResponse> response = restTemplate.exchange(
-                "http://USER/api/users/{username}/addAccountNumber/{accountNumber}",
-                HttpMethod.PATCH,
+                "http://USER/api/users",
+                HttpMethod.PUT,
                 entity,
-                UserResponse.class,
-                username,
-                account.getAccountNumber()        );
+                UserResponse.class
+                );
 
         if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
             throw new RuntimeException("Failed to update user with account number");

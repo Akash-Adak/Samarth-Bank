@@ -1,12 +1,27 @@
 import { useState, useEffect } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import { useAuth } from "../../context/AuthContext";
-import { User, Mail, Phone, Edit2, Save, X } from "lucide-react";
+import {
+  User,
+  Mail,
+  Phone,
+  Edit2,
+  Save,
+  X,
+  ShieldCheck,
+  AlertTriangle,
+  Clock
+} from "lucide-react";
 import api from "../../api/axios";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
+
   const { token } = useAuth();
+  const navigate = useNavigate();
+
+  // ================= STATES =================
 
   const [profile, setProfile] = useState({
     username: "",
@@ -16,9 +31,9 @@ export default function ProfilePage() {
     address: "",
     accountNumber: "",
     kycStatus: "",
-    dob:"",
-    docType:"",
-    docHash:""
+    dob: "",
+    docType: "",
+    docHash: ""
   });
 
   const [loading, setLoading] = useState(true);
@@ -30,12 +45,16 @@ export default function ProfilePage() {
     newPassword: "",
   });
 
-  // 🔥 LOAD PROFILE
+
+  // ================= LOAD PROFILE =================
+
   const loadProfile = async () => {
     try {
+
       const username = localStorage.getItem("username");
+
       const res = await api.get(`/api/users/${username}`);
-            console.log(res);
+
       setProfile({
         username: res.data.username || "",
         fullname: res.data.fullname || "",
@@ -43,49 +62,56 @@ export default function ProfilePage() {
         phone: res.data.phone || "",
         address: res.data.address || "",
         accountNumber: res.data.accountNumber || "",
-        kycStatus: res.data.kycStatus || "",
+        kycStatus: res.data.kycStatus || "PENDING",
+        dob: res.data.dob || "",
+        docType: res.data.docType || "",
+        docHash: res.data.docHash || "",
       });
 
       setLoading(false);
+
     } catch (err) {
       console.error("Failed to load profile", err);
       setLoading(false);
     }
   };
 
+
   useEffect(() => {
     loadProfile();
   }, []);
 
-  // 🔥 UPDATE PROFILE (PUT /api/users)
+
+  // ================= UPDATE PROFILE =================
+
   const handleSave = async () => {
     try {
+
       await api.put("/api/users", {
         username: profile.username,
         fullname: profile.fullname,
         email: profile.email,
         phone: profile.phone,
         address: profile.address,
-        accountNumber: profile.accountNumber,
-        kycStatus: profile.kycStatus,
-        dob:profile.dob,
-    docType:profile.docType,
-    docHash:profile.docHash
       });
 
       setIsEditing(false);
-      setMessage("Profile updated successfully!");
+      setMessage("✅ Profile updated successfully!");
 
       loadProfile();
+
     } catch (err) {
       console.error(err);
-      setMessage("Failed to update profile.");
+      setMessage("❌ Failed to update profile.");
     }
   };
 
-  // 🔥 CHANGE PASSWORD
+
+  // ================= CHANGE PASSWORD =================
+
   const handleChangePassword = async () => {
     try {
+
       await axios.post(
         `${import.meta.env.VITE_AUTH_URL}/auth/change-password`,
         passwordData,
@@ -95,12 +121,47 @@ export default function ProfilePage() {
       );
 
       setPasswordData({ oldPassword: "", newPassword: "" });
-      setMessage("Password changed successfully!");
+
+      setMessage("✅ Password changed successfully!");
+
     } catch (err) {
       console.error(err);
-      setMessage("Failed to change password.");
+      setMessage("❌ Failed to change password.");
     }
   };
+
+
+  // ================= KYC BADGE =================
+
+  const renderKycBadge = () => {
+
+    switch (profile.kycStatus) {
+
+      case "VERIFIED":
+        return (
+          <span className="flex items-center gap-1 text-green-700 bg-green-100 px-3 py-1 rounded-full text-sm font-medium">
+            <ShieldCheck size={16} /> Verified
+          </span>
+        );
+
+      case "REJECTED":
+        return (
+          <span className="flex items-center gap-1 text-red-700 bg-red-100 px-3 py-1 rounded-full text-sm font-medium">
+            <AlertTriangle size={16} /> Rejected
+          </span>
+        );
+
+      default:
+        return (
+          <span className="flex items-center gap-1 text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full text-sm font-medium">
+            <Clock size={16} /> Pending
+          </span>
+        );
+    }
+  };
+
+
+  // ================= LOADING =================
 
   if (loading)
     return (
@@ -109,9 +170,16 @@ export default function ProfilePage() {
       </DashboardLayout>
     );
 
+
+  // ================= UI =================
+
   return (
     <DashboardLayout>
+
       <h1 className="text-2xl font-bold mb-6">My Profile</h1>
+
+
+      {/* ================= MESSAGE ================= */}
 
       {message && (
         <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
@@ -119,29 +187,69 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* MAIN CARD */}
+
+      {/* ================= PROFILE CARD ================= */}
+
       <div className="bg-white p-6 rounded-xl shadow mb-10">
-        <div className="flex items-start justify-between">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+
+          {/* Left */}
           <div className="flex items-center gap-4">
+
             <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center text-4xl font-semibold text-gray-600">
               {profile.fullname[0] || "U"}
             </div>
 
             <div>
-              <h2 className="text-2xl font-semibold">{profile.fullname}</h2>
-              <p className="text-gray-500 text-sm">Account #{profile.accountNumber}</p>
+              <h2 className="text-2xl font-semibold">
+                {profile.fullname}
+              </h2>
+
+              <p className="text-gray-500 text-sm">
+                Account #{profile.accountNumber}
+              </p>
+
+              {/* KYC Badge */}
+              <div className="mt-2">
+                {renderKycBadge()}
+              </div>
             </div>
           </div>
 
-          <button
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-            onClick={() => setIsEditing(true)}
-          >
-            <Edit2 size={16} /> Edit Profile
-          </button>
+
+          {/* Right Buttons */}
+          <div className="flex gap-3 flex-wrap">
+
+            {/* KYC Button */}
+            {profile.kycStatus !== "VERIFIED" && (
+              <button
+                onClick={() => navigate("/kyc")}
+                className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg text-sm hover:bg-yellow-700"
+              >
+                <ShieldCheck size={16} />
+                Complete KYC
+              </button>
+            )}
+
+            {/* Edit Button */}
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+            >
+              <Edit2 size={16} />
+              Edit Profile
+            </button>
+
+          </div>
+
         </div>
 
+
+        {/* ================= INFO GRID ================= */}
+
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+
           <div>
             <p className="text-gray-500 text-sm">Full Name</p>
             <div className="flex items-center gap-2 mt-1">
@@ -168,33 +276,52 @@ export default function ProfilePage() {
 
           <div>
             <p className="text-gray-500 text-sm">Address</p>
-            <p className="font-medium">{profile.address || "Not added"}</p>
+            <p className="font-medium">
+              {profile.address || "Not added"}
+            </p>
           </div>
+
         </div>
+
       </div>
 
-      {/* EDIT MODAL */}
+
+      {/* ================= EDIT MODAL ================= */}
+
       {isEditing && (
+
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
           <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-lg">
+
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Edit Profile</h2>
+
+              <h2 className="text-xl font-semibold">
+                Edit Profile
+              </h2>
+
               <button
                 className="text-gray-600 hover:text-gray-800"
                 onClick={() => setIsEditing(false)}
               >
                 <X size={18} />
               </button>
+
             </div>
 
+
             <div className="flex flex-col gap-4">
+
               <input
                 type="text"
                 placeholder="Full Name"
                 className="border p-3 rounded-lg"
                 value={profile.fullname}
                 onChange={(e) =>
-                  setProfile({ ...profile, fullname: e.target.value })
+                  setProfile({
+                    ...profile,
+                    fullname: e.target.value
+                  })
                 }
               />
 
@@ -204,7 +331,10 @@ export default function ProfilePage() {
                 className="border p-3 rounded-lg"
                 value={profile.email}
                 onChange={(e) =>
-                  setProfile({ ...profile, email: e.target.value })
+                  setProfile({
+                    ...profile,
+                    email: e.target.value
+                  })
                 }
               />
 
@@ -214,7 +344,10 @@ export default function ProfilePage() {
                 className="border p-3 rounded-lg"
                 value={profile.phone}
                 onChange={(e) =>
-                  setProfile({ ...profile, phone: e.target.value })
+                  setProfile({
+                    ...profile,
+                    phone: e.target.value
+                  })
                 }
               />
 
@@ -224,42 +357,18 @@ export default function ProfilePage() {
                 className="border p-3 rounded-lg"
                 value={profile.address}
                 onChange={(e) =>
-                  setProfile({ ...profile, address: e.target.value })
+                  setProfile({
+                    ...profile,
+                    address: e.target.value
+                  })
                 }
               />
-              <input
-                type="date"
-                placeholder="date of birth"
-                className="border p-3 rounded-lg"
-                value={profile.dob}
-                onChange={(e) =>
-                  setProfile({ ...profile, dob: e.target.value })
-                }
-              />
-             <select
-              className="border p-3 rounded-lg"
-              value={profile.docType}
-              onChange={(e) =>
-                setProfile({ ...profile, docType: e.target.value })
-              }
-            >
-              <option value="">Select Document Type</option>
-              <option value="AADHAAR">AADHAAR</option>
-              <option value="PAN">PAN</option>
-            </select>
 
-              <input
-                type="text"
-                placeholder="docNumber"
-                className="border p-3 rounded-lg"
-                value={profile.docHash}
-                onChange={(e) =>
-                  setProfile({ ...profile, docHash: e.target.value })
-                }
-              />
             </div>
 
+
             <div className="flex justify-end gap-3 mt-5">
+
               <button
                 className="px-4 py-2 bg-gray-200 rounded-lg"
                 onClick={() => setIsEditing(false)}
@@ -274,10 +383,14 @@ export default function ProfilePage() {
                 <Save size={16} className="inline mr-1" />
                 Save Changes
               </button>
+
             </div>
+
           </div>
+
         </div>
       )}
+
     </DashboardLayout>
   );
 }

@@ -39,7 +39,7 @@ public class KycController {
         if (username.equals(null)) {
             return "You cannot add data ";
         }
-
+        System.out.println("from kyc controller "+registry);
         return kycVerificationService.addUserData( registry);
     }
 }

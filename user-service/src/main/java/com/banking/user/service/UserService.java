@@ -9,18 +9,15 @@ import com.banking.user.response.RegisterRequestResponse;
 import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.MessageDigest;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,32 +39,36 @@ public class UserService {
         user.setPhone(userModel.getPhone());
         user.setKycStatus(userModel.getKycStatus());
         user.setFullname(userModel.getFullname());
+        user.setKycStatus("PENDING");
+//        user.setDob(userModel.getDob());
+//        user.setDocHash(sha256(userModel.getDocHash()));
+//        user.setDocType(userModel.getDocType());
+//
+//        IdentityRegistry identityRegistry = new IdentityRegistry();
+//        identityRegistry.setDob(userModel.getDob());
+//
+//        identityRegistry.setDocHash(userModel.getDocHash());
+//
+//        identityRegistry.setDocType(userModel.getDocType());
+//        identityRegistry.setFullName(userModel.getFullname());
+//        String token = request.getHeader("Authorization");
+//        HttpHeaders headers = new HttpHeaders();
+////        headers.setContentType(MediaType.APPLICATION_JSON);
+//        headers.set("Authorization" , token);
+//
+//        HttpEntity<IdentityRegistry> entity = new HttpEntity<>(identityRegistry, headers);
+//
+//        ResponseEntity<IdentityRegistry> response = restTemplate.exchange(
+//                "http://KYC/api/kyc/addUserData",
+//                HttpMethod.POST,
+//                entity,
+//                IdentityRegistry.class
+//        );
 
-        IdentityRegistry identityRegistry = new IdentityRegistry();
-        identityRegistry.setDob(userModel.getDob());
 
-        identityRegistry.setDocHash(userModel.getDocHash());
-
-        identityRegistry.setDocType(userModel.getDocType());
-        identityRegistry.setFullName(userModel.getFullname());
-        String token = request.getHeader("Authorization");
-        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization" , token);
-
-        HttpEntity<IdentityRegistry> entity = new HttpEntity<>(identityRegistry, headers);
-
-        ResponseEntity<IdentityRegistry> response = restTemplate.exchange(
-                "http://KYC/api/kyc/addUserData",
-                HttpMethod.POST,
-                entity,
-                IdentityRegistry.class
-        );
-
-
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new RuntimeException("Failed to update user with account number");
-        }
+//        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+//            throw new RuntimeException("Failed to update user with account number");
+//        }
         return userRepository.save(user);
     }
 
@@ -85,7 +86,7 @@ public class UserService {
             old.setPhone(userModel.getPhone());
             old.setKycStatus(userModel.getKycStatus());
             old.setFullname(userModel.getFullname());
-
+            old.setAccountNumber(userModel.getAccountNumber());
         IdentityRegistry identityRegistry = new IdentityRegistry();
         identityRegistry.setDob(userModel.getDob());
 
@@ -180,5 +181,26 @@ public class UserService {
     }
 
 
+    public  String sha256(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(input.getBytes());
 
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Hashing failed");
+        }
+    }
+
+    public User updateKycStatus(String username, String kycStatus) {
+        User old = userRepository.findByUsername(username) .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+        old.setKycStatus(kycStatus);
+        return userRepository.save(old);
+
+    }
 }

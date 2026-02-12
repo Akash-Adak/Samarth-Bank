@@ -21,6 +21,7 @@ import Footer from "./components/Footer";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import KycPage from "./pages/dashboard/KycPage";
 
 export default function App() {
   const username = localStorage.getItem("username");
@@ -61,6 +62,11 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
+      <Route path="/kyc" element={ 
+           <ProtectedRoute>
+              <KycPage/>
+            </ProtectedRoute>} />
 
         <Route
           path="/dashboard/transactions"
