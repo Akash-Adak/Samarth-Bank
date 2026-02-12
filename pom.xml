@@ -32,6 +32,7 @@
         <module>eureka-server</module>
 		<module>loan-server</module>
 		<module>kyc-service</module>
+		<module>admin-server</module>
 
 
 	</modules>
