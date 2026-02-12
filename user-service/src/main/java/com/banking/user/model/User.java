@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -26,6 +28,34 @@ public class User {
     private String kycStatus; // PENDING, VERIFIED, REJECTED
 
     private String accountNumber;
+    private String docType;    // PAN / AADHAAR
+    private String docHash;
+    private LocalDate dob;
+
+
+    public String getDocType() {
+        return docType;
+    }
+
+    public void setDocType(String docType) {
+        this.docType = docType;
+    }
+
+    public String getDocHash() {
+        return docHash;
+    }
+
+    public void setDocHash(String docHash) {
+        this.docHash = docHash;
+    }
+
+    public LocalDate getDob() {
+        return dob;
+    }
+
+    public void setDob(LocalDate dob) {
+        this.dob = dob;
+    }
 
     public String getAccountNumber() {
         return accountNumber;
@@ -53,6 +83,14 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setEmail(String email) {

@@ -29,8 +29,8 @@ public class AccountController {
     public ResponseEntity<Account> createAccount(@RequestBody AccountRequest accountRequest, HttpServletRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         String token = request.getHeader("Authorization"); // Get the token from incoming request
-
-        return ResponseEntity.ok(accountService.createAccount(username, token,accountRequest.getType()));
+        System.out.println("from account controller"+accountRequest);
+        return ResponseEntity.ok(accountService.createAccount(username, token,accountRequest));
     }
 
 

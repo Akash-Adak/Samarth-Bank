@@ -1,6 +1,5 @@
 package com.banking.user.model;
 
-import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -13,5 +12,4 @@ public class IdentityRegistry {
     private String docHash;
     private String fullName;
     private LocalDate dob;
-    private String status;
 }

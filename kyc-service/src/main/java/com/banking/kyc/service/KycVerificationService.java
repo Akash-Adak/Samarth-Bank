@@ -12,7 +12,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -35,7 +40,8 @@ public class KycVerificationService extends Throwable {
     private  EmailTemplateUtil emailTemplateUtil;
     @Autowired
     private  IdentityRegistryRepository registryRepository;
-
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     public KycResponse verifyKyc(
@@ -75,6 +81,26 @@ public class KycVerificationService extends Throwable {
                     score >= 65
                             ? KycStatus.VERIFIED
                             : KycStatus.REJECTED;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", token);
+
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "http://USER/api/users/{username}/updateKycStatus/{kycStatus}",
+                    HttpMethod.PATCH,
+                    entity,
+                    String.class,
+                    username,
+                    status.name()
+            );
+
+
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new RuntimeException("Failed to update user with kyc statusr");
+        }
+
 
             // 🔹 Email subject
             String subject =
