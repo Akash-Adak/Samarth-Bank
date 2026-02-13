@@ -8,12 +8,11 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AccountConfig {
+
     @Bean
     @LoadBalanced
     public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        return restTemplate;
+        return new RestTemplate();
     }
-
 }
+

@@ -23,4 +23,7 @@ public interface LoanService {
     LoanResponseDto makeRepayment(Long loanId,String username,String token);
 
 //    Object applyxdLoan(@Valid LoanRequestDto request);
+
+
+    LoanResponseDto approveLoan(Long loanId);
 }

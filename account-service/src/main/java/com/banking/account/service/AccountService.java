@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -443,4 +444,18 @@ public class AccountService {
         Account a= repository.findByAccountNumber(accountNumber);
         return a.getBalance();
     }
+
+    @Transactional
+    public void creditAmount(String accountNumber, BigDecimal amount) {
+
+        Account account =
+                repository.findByAccountNumber(accountNumber);
+
+
+        account.setBalance(
+                account.getBalance().add(amount));
+
+        repository.save(account);
+    }
+
 }

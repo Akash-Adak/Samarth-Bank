@@ -182,49 +182,8 @@ export default function LoansPage() {
     }
   };
 
-  // Handle loan approval - Your backend endpoint: POST /api/loans/{loanId}/approve
-  const handleApproveLoan = async (loanId) => {
-    try {
-      console.log("Approving loan ID:", loanId);
-      
-      const response = await api_loan.post(`/api/loans/${loanId}/approve`);
-      
-      console.log("Approve response:", response.data);
-      
-      if (response.status === 200) {
-        showNotification("Loan approved successfully!", "success");
-        fetchLoans(); // Refresh data
-      } else {
-        throw new Error(response.data?.message || "Failed to approve loan");
-      }
-    } catch (err) {
-      console.error("Approve loan error:", err.response?.data || err);
-      const errorMessage = err.response?.data || err.message || "Failed to approve loan";
-      showNotification(typeof errorMessage === 'string' ? errorMessage : "Failed to approve loan", "error");
-    }
-  };
 
-  // Handle loan rejection - Your backend endpoint: POST /api/loans/{loanId}/reject
-  const handleRejectLoan = async (loanId) => {
-    try {
-      console.log("Rejecting loan ID:", loanId);
-      
-      const response = await api_loan.post(`/api/loans/${loanId}/reject`);
-      
-      console.log("Reject response:", response.data);
-      
-      if (response.status === 200) {
-        showNotification("Loan rejected successfully!", "success");
-        fetchLoans(); // Refresh data
-      } else {
-        throw new Error(response.data?.message || "Failed to reject loan");
-      }
-    } catch (err) {
-      console.error("Reject loan error:", err.response?.data || err);
-      const errorMessage = err.response?.data || err.message || "Failed to reject loan";
-      showNotification(typeof errorMessage === 'string' ? errorMessage : "Failed to reject loan", "error");
-    }
-  };
+
 //  handel repayment
 const handleRePayment = async (loanId) => {
   try {
@@ -389,22 +348,7 @@ const handleRePayment = async (loanId) => {
       accessor: "id",
       render: (id, row) => (
         <div className="flex space-x-2">
-          {row.status === "PENDING" && (
-            <>
-              <button 
-                onClick={() => handleApproveLoan(id)}
-                className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded hover:bg-green-200 transition-colors"
-              >
-                Approve
-              </button>
-              <button 
-                onClick={() => handleRejectLoan(id)}
-                className="px-3 py-1 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200 transition-colors"
-              >
-                Reject
-              </button>
-            </>
-          )}
+          
           {(row.status === "ACTIVE" || row.status === "APPROVED") && (
             <button 
               className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded hover:bg-blue-200 transition-colors"
