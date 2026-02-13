@@ -27,6 +27,17 @@ spring:
       password: LKIudJQ9HnyyOzJQZdBVf3BjDWQSHyac
       timeout: 3000
 
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: account-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+
+
 eureka:
   client:
     service-url:
@@ -47,3 +58,5 @@ management:
     export:
       prometheus:
         enabled: true
+
+

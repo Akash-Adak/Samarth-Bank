@@ -9,16 +9,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 @FeignClient(
         name = "loan",
-        url = "http://localhost:8086"
+        url = "http://localhost:8086",
+        configuration = FeignForceConfig.class
 )
-
 public interface LoanClient {
 
     @PatchMapping("/api/loans/{id}/approve")
-    LoanResponseDto approveLoan(
-            @PathVariable Long id,
-            @RequestHeader("Authorization") String token
-    );
+    LoanResponseDto approveLoan(@PathVariable Long id);
 }
+
 
 

@@ -1,5 +1,6 @@
 package com.banking.loan.service;
 
+import com.banking.loan.event.LoanApprovedEvent;
 import com.banking.loan.model.*;
 import com.banking.loan.repository.LoanRepository;
 import com.banking.loan.response.*;
@@ -32,7 +33,8 @@ public class LoanServiceImpl implements LoanService {
     private RestTemplate restTemplate;
     @Autowired
     private  KafkaProducerService kafkaProducerService;
-
+    @Autowired
+    private   LoanProducer loanProducer;
 
     @Override
     public LoanResponseDto applyLoan(LoanRequestDto req, String username, String token) throws AccessDeniedException {
@@ -514,6 +516,15 @@ public class LoanServiceImpl implements LoanService {
         loan.setStatus(LoanStatus.APPROVED);
         loan.setStartDate(LocalDate.now());
         loan.setEndDate(LocalDate.now().plusMonths(loan.getTenureMonths()));
+
+        LoanApprovedEvent event =
+                new LoanApprovedEvent(
+                        loan.getId(),
+                        loan.getAccountNumber(),
+                        loan.getPrincipalAmount()
+                );
+
+        loanProducer.sendLoanApprovedEvent(event);
 
         return mapToDto(loanRepository.save(loan));
     }

@@ -16,17 +16,8 @@ public class AdminLoanController {
     private final LoanClient loanClient;
 
     @PatchMapping("/{id}/approve")
-    public ResponseEntity<LoanResponseDto> approveLoan(
-            @PathVariable Long id,
-            HttpServletRequest request
-    ) {
-
-        // Get token from admin request
-        String token = request.getHeader("Authorization");
-
-        LoanResponseDto response =
-                loanClient.approveLoan(id, token);
-
+    public ResponseEntity<LoanResponseDto> approveLoan(@PathVariable Long id, HttpServletRequest request) {
+        LoanResponseDto response =loanClient.approveLoan(id);
         return ResponseEntity.ok(response);
     }
 }
