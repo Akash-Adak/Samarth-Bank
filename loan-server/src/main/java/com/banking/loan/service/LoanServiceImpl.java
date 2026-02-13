@@ -503,4 +503,19 @@ public class LoanServiceImpl implements LoanService {
                 / (Math.pow(1 + monthlyRate, tenureMonths) - 1);
         return BigDecimal.valueOf(emi).setScale(2, BigDecimal.ROUND_HALF_UP);
     }
+
+
+    @Override
+    public LoanResponseDto approveLoan(Long loanId) {
+
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new RuntimeException("Loan not found"));
+
+        loan.setStatus(LoanStatus.APPROVED);
+        loan.setStartDate(LocalDate.now());
+        loan.setEndDate(LocalDate.now().plusMonths(loan.getTenureMonths()));
+
+        return mapToDto(loanRepository.save(loan));
+    }
+
 }
