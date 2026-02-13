@@ -12,7 +12,7 @@ public class AccountConfig {
     @Bean
     @LoadBalanced
     public RestTemplate restTemplate() {
-        return new RestTemplate(); 
+        return new RestTemplate();
     }
 }
 
