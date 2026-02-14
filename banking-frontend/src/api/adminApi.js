@@ -25,3 +25,7 @@ export const approveLoan = (id) =>
 
 export const rejectLoan = (id) =>
   api.patch(`/dashboard/loans/${id}/reject`);
+
+
+export const getAllUsers = () =>
+  api.get(`/dashboard/user/details`);

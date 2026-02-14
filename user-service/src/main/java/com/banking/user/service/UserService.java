@@ -203,4 +203,21 @@ public class UserService {
         return userRepository.save(old);
 
     }
+
+    public List<UserModel> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(user -> {
+            UserModel model = new UserModel();
+            model.setId(user.getId());
+
+            model.setUsername(user.getUsername());
+            model.setEmail(user.getEmail());
+            model.setPhone(user.getPhone());
+            model.setAddress(user.getAddress());
+            model.setFullname(user.getFullname());
+            model.setKycStatus(user.getKycStatus());
+            model.setAccountNumber(user.getAccountNumber());
+            return model;
+        }).toList();
+    }
 }

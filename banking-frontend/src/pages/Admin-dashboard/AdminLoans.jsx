@@ -116,23 +116,24 @@ export default function AdminLoans() {
 
              
 
-             <td className="p-3 flex justify-center items-center gap-3">
+             <td className="p-3 text-center space-x-3">
 
                 <button
                   onClick={() => handleApprove(loan.id)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition"
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded-md text-sm"
                 >
-                  Approve
+                  ✓ Approve
                 </button>
 
                 <button
                   onClick={() => handleReject(loan.id)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition"
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-md text-sm"
                 >
-                  Reject
+                  ✕ Reject
                 </button>
 
             </td>
+
 
 
               </tr>

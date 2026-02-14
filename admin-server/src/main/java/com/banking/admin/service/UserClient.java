@@ -1,8 +1,12 @@
 package com.banking.admin.service;
 
 import com.banking.admin.config.FeignForceConfig;
+import com.banking.admin.dto.UserModel;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 @FeignClient(
         name = "user",
@@ -17,6 +21,10 @@ public interface UserClient {
     @GetMapping("/api/users/kyc/pending/count")
     Long countPendingKyc();
 
+    @GetMapping("/api/users/getAll")
+    List<UserModel> getUserList();
+
 //    @GetMapping("/api/users/blocked/count")
 //    Long countBlockedUsers();
 }
+

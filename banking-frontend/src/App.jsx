@@ -23,6 +23,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import KycPage from "./pages/dashboard/KycPage";
 import AdminLoans from "./pages/Admin-dashboard/AdminLoans";
+import AdminUsers from "./pages/Admin-dashboard/AdminUsers";
 
 export default function App() {
   const username = localStorage.getItem("username");
@@ -151,6 +152,14 @@ export default function App() {
           path="/admin/loans"
           element={  <AdminRoute> <AdminLoans/> </AdminRoute>}
         />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                <AdminUsers />
+              </AdminRoute>
+            }
+          />
 
 
         {/* SAFETY FALLBACK */}
