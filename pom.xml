@@ -33,12 +33,13 @@
 		<module>loan-server</module>
 		<module>kyc-service</module>
 		<module>admin-server</module>
+		<module>Payment-gatway-server</module>
 
 
 	</modules>
 
 	<properties>
-		<java.version>21</java.version>
+		<java.version>17</java.version>
 	</properties>
  <dependencyManagement>
 	 <dependencies>
