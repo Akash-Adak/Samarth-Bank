@@ -3,6 +3,7 @@ package com.banking.user.controller;
 //import com.banking.user.kafka.KafkaProducer;
 import com.banking.user.model.User;
 import com.banking.user.model.UserModel;
+import com.banking.user.repository.UserRepository;
 import com.banking.user.service.RedisService;
 import com.banking.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +27,8 @@ public class UserController {
 
     @Autowired
     private RedisService redisService;
-
+    @Autowired
+    private UserRepository userRepository;
     @PostMapping("/create-user")
     public ResponseEntity<?> createUser(@RequestBody UserModel user, HttpServletRequest request) {
 
@@ -135,5 +137,20 @@ public ResponseEntity<?> updateKycStatus(@PathVariable String username,@PathVari
 //        }
         return ResponseEntity.ok(u);
     }
+
+    @GetMapping("/count")
+    public Long countUsers() {
+        return userRepository.count();
+    }
+
+    @GetMapping("/kyc/pending/count")
+    public Long countPendingKyc() {
+        return userRepository.countByKycStatus("PENDING");
+    }
+
+//    @GetMapping("/blocked/count")
+//    public Long countBlocked() {
+//        return userRepository.countByBlocked(true);
+//    }
 
 }

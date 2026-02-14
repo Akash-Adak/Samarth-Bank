@@ -16,6 +16,8 @@ public interface LoanClient {
 
     @PatchMapping("/api/loans/{id}/approve")
     LoanResponseDto approveLoan(@PathVariable Long id);
+
+
 }
 
 
