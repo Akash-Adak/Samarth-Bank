@@ -23,7 +23,7 @@ public class AdminDashboardService {
 
 //                .pendingAccounts(accountClient.countPendingAccounts())
 
-//                .pendingLoans(loanClient.countPendingLoans())
+                .pendingLoans(loanClient.countPendingLoans())
 
 //                .todayTransactions(
 //                        transactionClient.countTodayTransactions()

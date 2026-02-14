@@ -25,6 +25,8 @@ public interface LoanClient {
     @GetMapping("/api/loans/pending")
     List<LoanDto> getPendingLoans();
 
+    @GetMapping("/api/loans/pending/count")
+    Long countPendingLoans();
 }
 
 

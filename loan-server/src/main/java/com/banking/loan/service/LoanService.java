@@ -29,4 +29,6 @@ public interface LoanService {
     LoanResponseDto approveLoan(Long loanId);
 
     List<Loan> getPendingLoans();
+
+
 }

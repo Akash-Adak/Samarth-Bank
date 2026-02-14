@@ -533,4 +533,6 @@ public class LoanServiceImpl implements LoanService {
     public List<Loan> getPendingLoans() {
         return loanRepository.findByStatus(LoanStatus.PENDING);
     }
+
+
 }

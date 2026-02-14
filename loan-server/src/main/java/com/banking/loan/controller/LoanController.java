@@ -126,4 +126,10 @@ public class LoanController {
     public List<Loan> getPendingLoans() {
         return loanService.getPendingLoans();
     }
+
+    @GetMapping("/pending/count")
+    public Long getPendingLoansCount() {
+        List<Loan> list =loanService.getPendingLoans();
+        return list.size() > 0 ? (long) list.size() : 0L;
+    }
 }
