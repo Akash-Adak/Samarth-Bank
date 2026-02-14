@@ -33,6 +33,7 @@
 		<module>loan-server</module>
 		<module>kyc-service</module>
 		<module>admin-server</module>
+		<module>Payment-gatway-server</module>
 
 
 	</modules>
