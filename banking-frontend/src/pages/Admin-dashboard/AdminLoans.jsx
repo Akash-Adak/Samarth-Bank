@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import {
   getPendingLoans,
-  approveLoan
+  approveLoan,
+  rejectLoan
 } from "../../api/adminApi";
 
 export default function AdminLoans() {
@@ -32,6 +33,21 @@ export default function AdminLoans() {
 
     try {
       await approveLoan(id);
+
+      // Remove approved loan from UI
+      setLoans(loans.filter(l => l.id !== id));
+
+    } catch (err) {
+      alert("Approval failed");
+    }
+  };
+
+    const handleReject = async (id) => {
+
+    if (!window.confirm("Reject this loan?")) return;
+
+    try {
+      await rejectLoan(id);
 
       // Remove approved loan from UI
       setLoans(loans.filter(l => l.id !== id));
@@ -100,16 +116,24 @@ export default function AdminLoans() {
 
              
 
-                <td className="p-3">
+             <td className="p-3 flex justify-center items-center gap-3">
 
-                  <button
-                    onClick={() => handleApprove(loan.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded"
-                  >
-                    Approve
-                  </button>
+                <button
+                  onClick={() => handleApprove(loan.id)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition"
+                >
+                  Approve
+                </button>
 
-                </td>
+                <button
+                  onClick={() => handleReject(loan.id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition"
+                >
+                  Reject
+                </button>
+
+            </td>
+
 
               </tr>
 

@@ -13,9 +13,9 @@ public interface LoanService {
 
     LoanResponseDto applyLoan(LoanRequestDto request,String username,String token) throws AccessDeniedException;
 
-    LoanResponseDto approveLoan(Long loanId,String username,String token);
 
-    LoanResponseDto rejectLoan(Long loanId,String username,String token);
+
+;
 
     List<LoanResponseDto> getLoansByAccountNumber(String accountNumber);
 
@@ -27,7 +27,7 @@ public interface LoanService {
 
 
     LoanResponseDto approveLoan(Long loanId);
-
+    LoanResponseDto rejectLoan(Long loanId);
     List<Loan> getPendingLoans();
 
 

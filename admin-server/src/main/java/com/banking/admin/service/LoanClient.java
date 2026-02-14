@@ -27,6 +27,9 @@ public interface LoanClient {
 
     @GetMapping("/api/loans/pending/count")
     Long countPendingLoans();
+
+    @PatchMapping("/api/loans/{id}/reject")
+    LoanResponseDto rejectLoan(Long id);
 }
 
 

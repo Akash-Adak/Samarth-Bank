@@ -22,3 +22,6 @@ export const getPendingLoans = () =>
 
 export const approveLoan = (id) =>
   api.patch(`/dashboard/loans/${id}/approve`);
+
+export const rejectLoan = (id) =>
+  api.patch(`/dashboard/loans/${id}/reject`);

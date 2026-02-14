@@ -33,6 +33,12 @@ public class AdminDashboardController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/loans/{id}/reject")
+    public ResponseEntity<LoanResponseDto> rejectLoan(@PathVariable Long id, HttpServletRequest request) {
+        LoanResponseDto response =loanClient.rejectLoan(id);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/loans/pending")
     public List<LoanDto> getPendingLoans() {
         return loanClient.getPendingLoans();

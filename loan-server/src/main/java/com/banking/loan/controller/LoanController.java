@@ -44,26 +44,6 @@ public class LoanController {
     }
 
 
-    // ✅ Approve Loan (Admin Only – if you want add ROLE check later)
-    @PostMapping("/{loanId}/approve")
-    public ResponseEntity<?> approve(@PathVariable Long loanId ,HttpServletRequest  request2) {
-        String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        String tokenWithBearer = request2.getHeader("Authorization");
-        String token = tokenWithBearer.replaceFirst("(?i)^Bearer\\s+", "");
-        return ResponseEntity.ok(loanService.approveLoan(loanId,jwtUsername,token));
-    }
-
-    // ❌ Reject Loan (Admin Only)
-    @PostMapping("/{loanId}/reject")
-    public ResponseEntity<?> reject(@PathVariable Long loanId,HttpServletRequest  request2) {
-        String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        String tokenWithBearer = request2.getHeader("Authorization");
-        String token = tokenWithBearer.replaceFirst("(?i)^Bearer\\s+", "");
-        return ResponseEntity.ok(loanService.rejectLoan(loanId,jwtUsername
-                ,token));
-    }
 
 
     // ✅ Get loans by account number (only own account)
@@ -71,13 +51,6 @@ public class LoanController {
     public ResponseEntity<?> byAccount(@PathVariable String accountNumber) {
 
         String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-//        User user = redisService.get(accountNumber, User.class);
-//
-//        if (user == null || !user.getUsername().equals(jwtUsername)) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body("❌ You cannot view loans of another account.");
-//        }
 
         return ResponseEntity.ok(loanService.getLoansByAccountNumber(accountNumber));
     }
@@ -120,6 +93,12 @@ public class LoanController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> approve(@PathVariable Long loanId) {
         return ResponseEntity.ok(loanService.approveLoan(loanId));
+    }
+
+    @PatchMapping("/{loanId}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> reject(@PathVariable Long loanId) {
+        return ResponseEntity.ok(loanService.rejectLoan(loanId));
     }
 
     @GetMapping("/pending")
