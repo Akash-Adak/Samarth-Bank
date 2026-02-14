@@ -1,5 +1,6 @@
 package com.banking.loan.service;
 
+import com.banking.loan.model.Loan;
 import com.banking.loan.model.LoanRequestDto;
 import com.banking.loan.model.LoanResponseDto;
 import com.banking.loan.model.RepaymentDto;
@@ -26,4 +27,6 @@ public interface LoanService {
 
 
     LoanResponseDto approveLoan(Long loanId);
+
+    List<Loan> getPendingLoans();
 }

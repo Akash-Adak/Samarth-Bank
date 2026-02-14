@@ -1,5 +1,6 @@
 package com.banking.loan.controller;
 
+import com.banking.loan.model.Loan;
 import com.banking.loan.model.LoanRequestDto;
 import com.banking.loan.model.LoanResponseDto;
 import com.banking.loan.model.RepaymentDto;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/loans")
@@ -120,4 +122,8 @@ public class LoanController {
         return ResponseEntity.ok(loanService.approveLoan(loanId));
     }
 
+    @GetMapping("/pending")
+    public List<Loan> getPendingLoans() {
+        return loanService.getPendingLoans();
+    }
 }

@@ -22,6 +22,7 @@ import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import KycPage from "./pages/dashboard/KycPage";
+import AdminLoans from "./pages/dashboard/AdminLoans";
 
 export default function App() {
   const username = localStorage.getItem("username");
@@ -86,14 +87,19 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/dashboard/loans"
-          element={
-            <ProtectedRoute>
+       <Route
+        path="/dashboard/loans"
+        element={
+          <ProtectedRoute>
+            {role === "ADMIN" ? (
+              <Navigate to="/admin/loans" replace />
+            ) : (
               <LoansPage />
-            </ProtectedRoute>
-          }
-        />
+            )}
+          </ProtectedRoute>
+        }
+      />
+
 
         <Route
           path="/dashboard/profile"
@@ -141,6 +147,11 @@ export default function App() {
             </AdminRoute>
           }
         />
+        <Route
+          path="/admin/loans"
+          element={  <AdminRoute> <AdminLoans/> </AdminRoute>}
+        />
+
 
         {/* SAFETY FALLBACK */}
         <Route

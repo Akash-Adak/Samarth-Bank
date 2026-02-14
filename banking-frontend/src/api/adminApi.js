@@ -16,3 +16,9 @@ api.interceptors.request.use((config) => {
 
 export const getAdminDashboard = () =>
   api.get("/dashboard");
+
+export const getPendingLoans = () =>
+  api.get("/dashboard/loans/pending");
+
+export const approveLoan = (id) =>
+  api.patch(`/dashboard/loans/${id}/approve`);

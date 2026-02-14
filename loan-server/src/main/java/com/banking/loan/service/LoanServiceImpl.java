@@ -529,4 +529,8 @@ public class LoanServiceImpl implements LoanService {
         return mapToDto(loanRepository.save(loan));
     }
 
+    @Override
+    public List<Loan> getPendingLoans() {
+        return loanRepository.findByStatus(LoanStatus.PENDING);
+    }
 }
