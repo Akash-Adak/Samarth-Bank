@@ -61,7 +61,8 @@ export default function AdminDashboard() {
 
         <Card title="Pending Accounts" value={data.pendingAccounts} />
 
-        <Card title="Pending Loans" value={data.pendingLoans} />
+       <Card title="Pending Loans" value={data.pendingLoans} link="/admin/loans"/>
+
 
         <Card title="Today's Transactions" value={data.todayTransactions} />
 
@@ -69,26 +70,7 @@ export default function AdminDashboard() {
 
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow p-6">
-
-        <h2 className="text-xl font-semibold mb-4">
-          Quick Actions
-        </h2>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-          <ActionBtn text="Review KYC" link="/admin/kyc" />
-
-          <ActionBtn text="Approve Accounts" link="/admin/accounts" />
-
-          <ActionBtn text="Manage Loans" link="/admin/loans" />
-
-          <ActionBtn text="View Transactions" link="/admin/transactions" />
-
-        </div>
-
-      </div>
+     
 
     </DashboardLayout>
   );
