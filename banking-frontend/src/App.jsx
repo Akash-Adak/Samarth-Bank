@@ -9,7 +9,7 @@ import TransactionsPage from "./pages/dashboard/TransactionsPage";
 import NotificationsPage from "./pages/dashboard/NotificationsPage";
 import LoansPage from "./pages/dashboard/LoansPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";
-import AdminDashboard from "./pages/dashboard/AdminDashboard";
+import AdminDashboard from "./pages/Admin-dashboard/AdminDashboard";
 
 import SendMoney from "./pages/money/SendMoney";
 import AddMoney from "./pages/money/AddMoney";
@@ -22,6 +22,8 @@ import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import KycPage from "./pages/dashboard/KycPage";
+import AdminLoans from "./pages/Admin-dashboard/AdminLoans";
+import AdminUsers from "./pages/Admin-dashboard/AdminUsers";
 
 export default function App() {
   const username = localStorage.getItem("username");
@@ -86,14 +88,19 @@ export default function App() {
           }
         />
 
-        <Route
-          path="/dashboard/loans"
-          element={
-            <ProtectedRoute>
+       <Route
+        path="/dashboard/loans"
+        element={
+          <ProtectedRoute>
+            {role === "ADMIN" ? (
+              <Navigate to="/admin/loans" replace />
+            ) : (
               <LoansPage />
-            </ProtectedRoute>
-          }
-        />
+            )}
+          </ProtectedRoute>
+        }
+      />
+
 
         <Route
           path="/dashboard/profile"
@@ -141,6 +148,19 @@ export default function App() {
             </AdminRoute>
           }
         />
+        <Route
+          path="/admin/loans"
+          element={  <AdminRoute> <AdminLoans/> </AdminRoute>}
+        />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                <AdminUsers />
+              </AdminRoute>
+            }
+          />
+
 
         {/* SAFETY FALLBACK */}
         <Route

@@ -55,22 +55,24 @@ public class AuthService {
         claims.put("role", user.getRoles());
 
         String token = jwtUtil.generateToken(claims, user.getUsername());
+        if(user.getRoles()=="USER") {
 
-        // ✅ FIX: Add JSON content type
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + token);
 
-        Userdto dto = new Userdto(user.getUsername(), user.getPhone(), user.getEmail());
-        HttpEntity<Userdto> entity = new HttpEntity<>(dto, headers);
+            // ✅ FIX: Add JSON content type
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("Authorization", "Bearer " + token);
 
-        // ✅ Ensure RestTemplate bean is properly configured
-        ResponseEntity<UserResponse> response = restTemplate.exchange(
-                "http://USER/api/users/create-user",
-                HttpMethod.POST,
-                entity,
-                UserResponse.class
-        );
+            Userdto dto = new Userdto(user.getUsername(), user.getPhone(), user.getEmail());
+            HttpEntity<Userdto> entity = new HttpEntity<>(dto, headers);
+
+            // ✅ Ensure RestTemplate bean is properly configured
+            ResponseEntity<UserResponse> response = restTemplate.exchange(
+                    "http://USER/api/users/create-user",
+                    HttpMethod.POST,
+                    entity,
+                    UserResponse.class
+            );
 
 
 //        ResponseEntity<AccountResponse> response2 = restTemplate.exchange(
@@ -80,10 +82,10 @@ public class AuthService {
 //                UserResponse.class
 //        );
 
-        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
-            throw new RunTimeException("Failed to create user in user-service");
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                throw new RunTimeException("Failed to create user in user-service");
+            }
         }
-
         repo.save(user);
 
         RegisterRequestResponse event = new RegisterRequestResponse();

@@ -3,6 +3,7 @@ package com.banking.user.controller;
 //import com.banking.user.kafka.KafkaProducer;
 import com.banking.user.model.User;
 import com.banking.user.model.UserModel;
+import com.banking.user.repository.UserRepository;
 import com.banking.user.service.RedisService;
 import com.banking.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,12 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -26,7 +32,8 @@ public class UserController {
 
     @Autowired
     private RedisService redisService;
-
+    @Autowired
+    private UserRepository userRepository;
     @PostMapping("/create-user")
     public ResponseEntity<?> createUser(@RequestBody UserModel user, HttpServletRequest request) {
 
@@ -136,4 +143,25 @@ public ResponseEntity<?> updateKycStatus(@PathVariable String username,@PathVari
         return ResponseEntity.ok(u);
     }
 
+    @GetMapping("/count")
+    public Long countUsers() {
+        return userRepository.count();
+    }
+
+    @GetMapping("/kyc/pending/count")
+    public Long countPendingKyc() {
+        return userRepository.countByKycStatus("PENDING");
+    }
+
+//    @GetMapping("/blocked/count")
+//    public Long countBlocked() {
+//        return userRepository.countByBlocked(true);
+//    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/getAll")
+    public ResponseEntity<List<UserModel>>  getAll(){
+        List<UserModel> users=  userService.getAllUsers();
+        return new ResponseEntity<>(users,HttpStatus.OK);
+    }
 }

@@ -1,5 +1,6 @@
 package com.banking.loan.controller;
 
+import com.banking.loan.model.Loan;
 import com.banking.loan.model.LoanRequestDto;
 import com.banking.loan.model.LoanResponseDto;
 import com.banking.loan.model.RepaymentDto;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.AccessDeniedException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/loans")
@@ -42,26 +44,6 @@ public class LoanController {
     }
 
 
-    // ✅ Approve Loan (Admin Only – if you want add ROLE check later)
-    @PostMapping("/{loanId}/approve")
-    public ResponseEntity<?> approve(@PathVariable Long loanId ,HttpServletRequest  request2) {
-        String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        String tokenWithBearer = request2.getHeader("Authorization");
-        String token = tokenWithBearer.replaceFirst("(?i)^Bearer\\s+", "");
-        return ResponseEntity.ok(loanService.approveLoan(loanId,jwtUsername,token));
-    }
-
-    // ❌ Reject Loan (Admin Only)
-    @PostMapping("/{loanId}/reject")
-    public ResponseEntity<?> reject(@PathVariable Long loanId,HttpServletRequest  request2) {
-        String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        String tokenWithBearer = request2.getHeader("Authorization");
-        String token = tokenWithBearer.replaceFirst("(?i)^Bearer\\s+", "");
-        return ResponseEntity.ok(loanService.rejectLoan(loanId,jwtUsername
-                ,token));
-    }
 
 
     // ✅ Get loans by account number (only own account)
@@ -69,13 +51,6 @@ public class LoanController {
     public ResponseEntity<?> byAccount(@PathVariable String accountNumber) {
 
         String jwtUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-//        User user = redisService.get(accountNumber, User.class);
-//
-//        if (user == null || !user.getUsername().equals(jwtUsername)) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                    .body("❌ You cannot view loans of another account.");
-//        }
 
         return ResponseEntity.ok(loanService.getLoansByAccountNumber(accountNumber));
     }
@@ -120,4 +95,20 @@ public class LoanController {
         return ResponseEntity.ok(loanService.approveLoan(loanId));
     }
 
+    @PatchMapping("/{loanId}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> reject(@PathVariable Long loanId) {
+        return ResponseEntity.ok(loanService.rejectLoan(loanId));
+    }
+
+    @GetMapping("/pending")
+    public List<Loan> getPendingLoans() {
+        return loanService.getPendingLoans();
+    }
+
+    @GetMapping("/pending/count")
+    public Long getPendingLoansCount() {
+        List<Loan> list =loanService.getPendingLoans();
+        return list.size() > 0 ? (long) list.size() : 0L;
+    }
 }
