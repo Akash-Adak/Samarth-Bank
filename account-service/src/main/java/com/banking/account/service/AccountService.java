@@ -458,4 +458,111 @@ public class AccountService {
         repository.save(account);
     }
 
+
+
+
+    public boolean addMoneyAfterPayment(
+            String accountNumber,
+            BigDecimal amount,
+            String token
+    ) {
+
+        return Optional.ofNullable(
+                repository.findByAccountNumber(accountNumber)
+        ).map(account -> {
+
+            // 1️⃣ Update Balance
+            account.setBalance(
+                    account.getBalance().add(amount)
+            );
+
+            repository.save(account);
+
+            // 2️⃣ Fetch User Info
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", token);
+
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            try {
+
+                ResponseEntity<UserResponse> response =
+                        restTemplate.exchange(
+                                "http://USER/api/users/get-by-account/{accountNumber}",
+                                HttpMethod.GET,
+                                entity,
+                                UserResponse.class,
+                                accountNumber
+                        );
+
+                UserResponse user = response.getBody();
+
+                if (user == null) {
+                    return false;
+                }
+
+                // 3️⃣ Send Notification
+                sendAddMoneyNotification(user, account, amount);
+
+                return true;
+
+            } catch (Exception e) {
+
+                return false;
+            }
+
+        }).orElse(false);
+    }
+    private void sendAddMoneyNotification(
+            UserResponse user,
+            Account account,
+            BigDecimal amount
+    ) {
+
+        String maskedAccount =
+                "xxxxxx" + account.getAccountNumber()
+                        .substring(account.getAccountNumber().length() - 4);
+
+        String date = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        String subject =
+                "💰 Money Added Successfully – ₹" + amount;
+
+        String body =
+                "<html>" +
+                        "<body style='font-family:Arial'>" +
+
+                        "<h3>Hello " + user.getFullname() + ",</h3>" +
+
+                        "<p>₹" + amount + " has been added to your wallet.</p>" +
+
+                        "<p><b>Account:</b> " + maskedAccount + "</p>" +
+
+                        "<p><b>Balance:</b> ₹" + account.getBalance() + "</p>" +
+
+                        "<p><b>Date:</b> " + date + "</p>" +
+
+                        "<br>" +
+                        "<p>— Team VASTA Bank</p>" +
+
+                        "</body>" +
+                        "</html>";
+
+        RegisterRequestResponse event =
+                new RegisterRequestResponse();
+
+        event.setUsername(subject);
+        event.setEmail(user.getEmail());
+        event.setBody(body);
+
+        String json = new Gson().toJson(event);
+
+        kafkaProducerService.sendLoginSuccess(
+                "banking-users",
+                json
+        );
+    }
+
+
 }

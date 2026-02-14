@@ -2,7 +2,7 @@
 import { CreditCard, Building, Wallet } from "lucide-react";
 
 export const bankConfig = {
-  name: "HDFC Bank",
+  name: "VASTA Bank",
   logo: "🏦",
   colors: {
     primary: "#004C6C",

@@ -75,6 +75,25 @@ public class AccountController {
     }
 
 
+    @PostMapping("/wallet/add-money/confirm")
+    public ResponseEntity<String> confirmAddMoney(@RequestBody BalanceUpdateRequest request, HttpServletRequest httpRequest) {
+
+        String token = httpRequest.getHeader("Authorization");
+        boolean success = accountService.addMoneyAfterPayment(
+                request.getAccountNumber(),
+                request.getAmount(),
+                token
+        );
+        if (success) {
+            return ResponseEntity.ok("Wallet credited successfully");
+        }
+
+        return ResponseEntity.badRequest()
+                .body("Failed to credit wallet");
+    }
+
+
+
 
 }
 
