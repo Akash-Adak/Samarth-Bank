@@ -1,453 +1,497 @@
-import React, { useState, useEffect } from "react";
-import { 
-  Wallet, 
-  ArrowRight, 
-  Building2, 
-  User, 
-  IndianRupee, 
-  ShieldCheck, 
-  AlertCircle,
-  CheckCircle2,
-  History,
-  TrendingUp,
-  CreditCard,
-  FileText,
-  ChevronLeft,
-  Lock,
-  Loader2,
-  Share2,
-  Download
-} from "lucide-react";
-
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-// 2. Mock API
-const api_transaction = {
-  post: (url, data) => new Promise((resolve, reject) => {
-    // Simulate network delay
-    setTimeout(() => {
-        if (Math.random() > 0.1) resolve({ status: 200, data: { txnId: "TXN" + Date.now() } });
-        else reject(new Error("Network Error"));
-    }, 2000);
-  })
-};
-const balance=localStorage.getItem("accountBalance");
-// --- END MOCK DEFINITIONS ---
-
-// Helper for formatting currency input
-const formatInputCurrency = (value) => {
-    if (!value) return "";
-    return new Intl.NumberFormat("en-IN").format(value);
-};
+import DashboardLayout from "../../layout/DashboardLayout";
+import { transferMoney } from "../../api/transactionApi";
 
 export default function SendMoney() {
-  // STEPS: 0=Details, 1=Review, 2=PIN, 3=Processing, 4=Success, 5=Fail
-  const [step, setStep] = useState(0);
-  const [loadingMsg, setLoadingMsg] = useState("");
-  
-  // Form State
-  const username=localStorage.getItem("username");
-  const accountNumber = localStorage.getItem(`accountNumber-${username}`) ;
+  const navigate = useNavigate();
+
+  const username = localStorage.getItem("username");
+  const fromAccount = localStorage.getItem(`accountNumber-${username}`);
+  const token = localStorage.getItem("token");
+
+  const balance = Number(localStorage.getItem("accountBalance") || 0);
+
+  const [step, setStep] = useState(0); // 0=form 1=review 2=pin 3=loading 4=success
+  const [loading, setLoading] = useState(false);
+
   const [form, setForm] = useState({
-    recipientName: "",
     toAccount: "",
-    confirmToAccount: "",
-    ifsc: "",
+    confirm: "",
     amount: "",
-    remarks: "",
-    type: "TRANSFER",
-    fromAccount: accountNumber,
   });
 
   const [errors, setErrors] = useState({});
-  const [bankDetails, setBankDetails] = useState(null);
   const [pin, setPin] = useState(["", "", "", ""]);
 
-  // Auto-detect Bank from IFSC Mock
-  useEffect(() => {
-    if (form.ifsc.length === 11) {
-       const code = form.ifsc.toUpperCase().slice(0, 4);
-       const banks = {
-           "HDFC": "HDFC Bank",
-           "SBIN": "State Bank of India",
-           "ICIC": "ICICI Bank",
-           "BARB": "Bank of Baroda",
-           "UTIB": "Axis Bank"
-       };
-       setBankDetails(banks[code] || "Unknown Bank");
-    } else {
-        setBankDetails(null);
-    }
-  }, [form.ifsc]);
+  /* ---------------- VALIDATION ---------------- */
 
-  // Validation Logic
-  const validateStep1 = () => {
-    const newErrors = {};
-    if (!form.recipientName) newErrors.recipientName = "Recipient name is required";
-    if (!/^\d{9,18}$/.test(form.toAccount)) newErrors.toAccount = "Invalid Account Number (9-18 digits)";
-    if (form.toAccount !== form.confirmToAccount) newErrors.confirmToAccount = "Account numbers do not match";
-    if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(form.ifsc.toUpperCase())) newErrors.ifsc = "Invalid IFSC Code format";
-    if (!form.amount || Number(form.amount) <= 0) newErrors.amount = "Enter a valid amount";
-    if (Number(form.amount) > 1000000) newErrors.amount = "Limit exceeded (Max ₹10L)";
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
- const navigate = useNavigate();
-  const handleProceedToReview = () => {
-    if (validateStep1()) setStep(1);
+  const validate = () => {
+    const e = {};
+
+    if (!/^\d{9,18}$/.test(form.toAccount))
+      e.toAccount = "Invalid Account Number";
+
+    if (form.toAccount !== form.confirm)
+      e.confirm = "Account numbers do not match";
+
+    if (!form.amount || form.amount <= 0)
+      e.amount = "Invalid Amount";
+
+    if (Number(form.amount) > balance)
+      e.amount = "Insufficient Balance";
+
+    setErrors(e);
+
+    return Object.keys(e).length === 0;
   };
 
-  const handlePinChange = (index, value) => {
-    if (isNaN(value)) return;
-    const newPin = [...pin];
-    newPin[index] = value;
-    setPin(newPin);
-    
-    // Auto focus next input
-    if (value && index < 3) {
-        document.getElementById(`pin-${index + 1}`).focus();
+  /* ---------------- PIN ---------------- */
+
+  const handlePin = (i, v) => {
+    if (!/^\d?$/.test(v)) return;
+
+    const p = [...pin];
+    p[i] = v;
+    setPin(p);
+
+    if (v && i < 3) {
+      document.getElementById(`pin-${i + 1}`)?.focus();
     }
   };
+
+  const handlePinKeyDown = (i, e) => {
+    if (e.key === "Backspace" && !pin[i] && i > 0) {
+      document.getElementById(`pin-${i - 1}`)?.focus();
+    }
+  };
+
+  /* ---------------- REAL TRANSFER ---------------- */
 
   const handleTransfer = async () => {
-     if (pin.join("").length !== 4) return alert("Please enter 4-digit PIN");
-     
-     setStep(3); // Processing
-     
-     const sequence = [
-         "Authenticating Secure PIN...",
-         "Connecting to Bank Server...",
-         `Verifying Receiver: ${form.recipientName}...`,
-         "Initiating Fund Transfer..."
-     ];
+    if (loading) return;
 
-     for (let i = 0; i < sequence.length; i++) {
-         setLoadingMsg(sequence[i]);
-         await new Promise(r => setTimeout(r, 800)); // Simulate delay per step
-     }
+    if (pin.join("").length !== 4) {
+      alert("Enter 4-digit PIN");
+      return;
+    }
 
-     try {
-         await api_transaction.post("/api/transactions", {
-             ...form, 
-             amount: Number(form.amount),
-             ifsc: form.ifsc.toUpperCase()
-         });
-         setStep(4); // Success
-     } catch (err) {
-         setStep(5); // Fail
-     }
+    setLoading(true);
+    setStep(3);
+
+    try {
+      await transferMoney({
+        fromAccount: fromAccount,
+        toAccount: form.toAccount,
+        amount: Number(form.amount),
+        type: "TRANSFER",
+      });
+
+      // Update balance locally
+      const newBal = balance - Number(form.amount);
+      localStorage.setItem("accountBalance", newBal);
+
+      setStep(4);
+    } catch (error) {
+      console.error("Transaction error:", error.response?.data || error.message);
+      alert("Transaction Failed");
+      setStep(2);
+    }
+
+    setLoading(false);
   };
 
-  // --- RENDER HELPERS ---
+  /* ---------------- RESET ---------------- */
 
-  const InputGroup = ({ label, error, children, subLabel }) => (
-    <div className="mb-5">
-        <label className="block text-sm font-semibold text-gray-700 mb-1.5 flex justify-between">
-            {label}
-            {subLabel && <span className="text-gray-400 font-normal text-xs">{subLabel}</span>}
-        </label>
-        {children}
-        {error && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={10}/> {error}</p>}
-    </div>
-  );
+  const reset = () => {
+    setForm({
+      toAccount: "",
+      confirm: "",
+      amount: "",
+    });
+    setPin(["", "", "", ""]);
+    setErrors({});
+    setLoading(false);
+    setStep(0);
+  };
 
-  // 1. INPUT FORM
-  if (step === 0) return (
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 mb-6 text-gray-500 hover:text-blue-700 cursor-pointer transition">
-             <ChevronLeft size={20}/>  <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
-        </div>
-        
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-6 text-white">
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                    <IndianRupee className="bg-white/20 p-1 rounded-lg" size={32}/> Send Money
-                </h1>
-                <p className="text-blue-100 text-sm mt-1 ml-1">Secure Instant Bank Transfer (IMPS/NEFT)</p>
-            </div>
+  /* =====================================================
+     FORM
+     ===================================================== */
 
-            <div className="p-8">
-                {/* From Account Badge */}
-                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-8 flex items-center justify-between">
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Debiting From</p>
-                        <p className="text-blue-900 font-bold font-mono text-lg mt-1">XXXX XXXX {accountNumber.slice(-4)}</p>
-                        <p className="text-xs text-blue-600">Savings Account • EBT Bank</p>
-                    </div>
-                    <div className="text-right">
-                        <p className="text-xs text-gray-500">Available Balance</p>
-                        <p className="text-green-700 font-bold text-lg">₹ {balance}</p>
-                    </div>
+  if (step === 0)
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
+                <h1 className="text-xl font-bold text-white">Send Money</h1>
+                <p className="text-blue-100 text-sm mt-1">Transfer to any bank account</p>
+              </div>
+
+              {/* Balance Card */}
+              <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-600">From Account</p>
+                    <p className="font-mono text-gray-800">**** {fromAccount?.slice(-4)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-gray-600">Available Balance</p>
+                    <p className="text-xl font-bold text-green-600">₹{balance.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form */}
+              <div className="p-6 space-y-5">
+                {/* To Account */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Receiver's Account Number
+                  </label>
+                  <input
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="Enter account number"
+                    value={form.toAccount}
+                    maxLength={18}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        toAccount: e.target.value.replace(/\D/g, ""),
+                      })
+                    }
+                  />
+                  {errors.toAccount && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.toAccount}
+                    </p>
+                  )}
                 </div>
 
-                {/* Form Fields */}
-                <div className="grid md:grid-cols-2 gap-x-6">
-                    <div className="md:col-span-2">
-                        <InputGroup label="Recipient Name" error={errors.recipientName}>
-                            <div className="relative">
-                                <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                                <input 
-                                    type="text" 
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium"
-                                    placeholder="Enter receiver's full name"
-                                    value={form.recipientName}
-                                    onChange={e => setForm({...form, recipientName: e.target.value})}
-                                />
-                            </div>
-                        </InputGroup>
-                    </div>
-
-                    <InputGroup label="Account Number" error={errors.toAccount}>
-                        <div className="relative">
-                            <Building2 className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                            <input 
-                                type="text" 
-                                maxLength={18}
-                                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all font-mono"
-                                placeholder="Receiver's Account No."
-                                value={form.toAccount}
-                                onChange={e => setForm({...form, toAccount: e.target.value.replace(/\D/g,'')})}
-                            />
-                        </div>
-                    </InputGroup>
-
-                    <InputGroup label="Re-enter Account No." error={errors.confirmToAccount}>
-                         <div className="relative">
-                            <Building2 className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                            <input 
-                                type="password" 
-                                maxLength={18}
-                                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all font-mono placeholder:tracking-widest"
-                                placeholder="••••••••••••"
-                                value={form.confirmToAccount}
-                                onChange={e => setForm({...form, confirmToAccount: e.target.value.replace(/\D/g,'')})}
-                            />
-                        </div>
-                    </InputGroup>
-
-                    <div className="md:col-span-2">
-                        <InputGroup label="IFSC Code" error={errors.ifsc} subLabel={bankDetails && <span className="text-green-600 font-bold">{bankDetails}</span>}>
-                            <div className="relative">
-                                <div className="absolute left-3 top-3.5 text-gray-400 font-bold text-xs border border-gray-300 rounded px-1">IFSC</div>
-                                <input 
-                                    type="text" 
-                                    maxLength={11}
-                                    className="w-full pl-14 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all font-mono uppercase"
-                                    placeholder="e.g. SBIN0001234"
-                                    value={form.ifsc}
-                                    onChange={e => setForm({...form, ifsc: e.target.value.toUpperCase()})}
-                                />
-                            </div>
-                        </InputGroup>
-                    </div>
-
-                    <div className="md:col-span-2 pt-4 border-t border-dashed border-gray-200">
-                        <InputGroup label="Amount" error={errors.amount}>
-                            <div className="relative">
-                                <span className="absolute left-4 top-2 text-gray-400 text-2xl font-bold">₹</span>
-                                <input 
-                                    type="number" 
-                                    className="w-full pl-10 pr-4 py-2 text-3xl font-bold text-gray-800 bg-transparent border-b-2 border-gray-200 focus:border-blue-600 outline-none transition-colors placeholder:text-gray-300"
-                                    placeholder="0.00"
-                                    value={form.amount}
-                                    onChange={e => setForm({...form, amount: e.target.value})}
-                                />
-                            </div>
-                        </InputGroup>
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                        <InputGroup label="Remarks (Optional)">
-                            <input 
-                                type="text" 
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition-all"
-                                placeholder="What is this for?"
-                                value={form.remarks}
-                                onChange={e => setForm({...form, remarks: e.target.value})}
-                            />
-                        </InputGroup>
-                    </div>
+                {/* Confirm Account */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Confirm Account Number
+                  </label>
+                  <input
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="Re-enter account number"
+                    value={form.confirm}
+                    maxLength={18}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        confirm: e.target.value.replace(/\D/g, ""),
+                      })
+                    }
+                  />
+                  {errors.confirm && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.confirm}
+                    </p>
+                  )}
                 </div>
 
-                <button 
-                    onClick={handleProceedToReview}
-                    className="w-full mt-4 bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg"
+                {/* Amount */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Amount (₹)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-3 text-gray-500">₹</span>
+                    <input
+                      type="number"
+                      className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                      placeholder="0.00"
+                      value={form.amount}
+                      onChange={(e) =>
+                        setForm({ ...form, amount: e.target.value })
+                      }
+                    />
+                  </div>
+                  {errors.amount && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.amount}
+                    </p>
+                  )}
+                </div>
+
+                {/* Quick Amount Selector */}
+                <div className="flex gap-2 pt-2">
+                  {[500, 1000, 2000, 5000].map((amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => setForm({ ...form, amount: amt })}
+                      className="flex-1 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      ₹{amt}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Continue Button */}
+                <button
+                  onClick={() => validate() && setStep(1)}
+                  className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-800 transform transition-all duration-200 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                    Proceed to Review <ArrowRight size={20}/>
+                  Continue
                 </button>
+
+                {/* Back Button */}
+                <button
+                  onClick={() => navigate(-1)}
+                  className="w-full text-gray-600 py-2 hover:text-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-            
-            <div className="bg-gray-50 p-4 text-center text-xs text-gray-500 border-t border-gray-200 flex justify-center items-center gap-2">
-                <Lock size={12}/> Your transaction is secured with 256-bit SSL encryption
-            </div>
+          </div>
         </div>
-      </div>
-  );
-
-  // 2. REVIEW SCREEN
-  if (step === 1) return (
-      <DashboardLayout>
-          <div className="max-w-md mx-auto mt-10">
-              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden relative">
-                  <div className="bg-blue-900 p-6 text-white text-center pb-12">
-                      <h2 className="text-lg font-medium opacity-80">Review Transfer</h2>
-                      <h1 className="text-4xl font-bold mt-2">₹ {formatInputCurrency(form.amount)}</h1>
-                  </div>
-                  
-                  <div className="bg-white rounded-t-3xl -mt-6 p-8 relative z-10">
-                      <div className="flex flex-col gap-6">
-                          <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                              <span className="text-gray-500 text-sm">To</span>
-                              <div className="text-right">
-                                  <p className="font-bold text-gray-800 text-lg">{form.recipientName}</p>
-                                  <p className="text-sm text-gray-500">A/c: {form.toAccount}</p>
-                                  <p className="text-xs text-blue-600 font-bold">{bankDetails || form.ifsc}</p>
-                              </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                              <span className="text-gray-500 text-sm">From</span>
-                              <div className="text-right">
-                                  <p className="font-bold text-gray-800">My Savings Account</p>
-                                  <p className="text-sm text-gray-500">XXXX {accountNumber.slice(-4)}</p>
-                              </div>
-                          </div>
-
-                          <div className="flex justify-between items-center">
-                              <span className="text-gray-500 text-sm">Remarks</span>
-                              <span className="text-gray-800 font-medium">{form.remarks || "Fund Transfer"}</span>
-                          </div>
-                      </div>
-
-                      <div className="mt-8 flex gap-4">
-                          <button 
-                            onClick={() => setStep(0)}
-                            className="flex-1 py-3 text-gray-600 font-bold hover:bg-gray-50 rounded-xl transition"
-                          >
-                              Edit
-                          </button>
-                          <button 
-                            onClick={() => setStep(2)}
-                            className="flex-[2] bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-xl shadow-lg shadow-blue-200 transition"
-                          >
-                              Pay Securely
-                          </button>
-                      </div>
-                  </div>
-              </div>
-          </div>
       </DashboardLayout>
-  );
+    );
 
-  // 3. PIN SCREEN
-  if (step === 2) return (
+  /* =====================================================
+     REVIEW
+     ===================================================== */
+
+  if (step === 1)
+    return (
       <DashboardLayout>
-           <div className="max-w-md mx-auto mt-16 text-center">
-              <div className="bg-white rounded-3xl shadow-xl p-8">
-                  <div className="mb-6 inline-flex p-4 bg-blue-50 rounded-full text-blue-700">
-                      <Lock size={32} />
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Enter Secure PIN</h2>
-                  <p className="text-gray-500 text-sm mb-8">Please enter your 4-digit transaction PIN to authorize the transfer of <b>₹{formatInputCurrency(form.amount)}</b></p>
-                  
-                  <div className="flex justify-center gap-4 mb-8">
-                      {[0,1,2,3].map(i => (
-                          <input 
-                            key={i}
-                            id={`pin-${i}`}
-                            type="password"
-                            maxLength={1}
-                            className="w-14 h-14 border-2 border-gray-200 rounded-xl text-center text-2xl font-bold focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all"
-                            value={pin[i]}
-                            onChange={(e) => handlePinChange(i, e.target.value)}
-                          />
-                      ))}
-                  </div>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
+                <h2 className="text-xl font-bold text-white">Review Transfer</h2>
+                <p className="text-blue-100 text-sm mt-1">Please verify the details</p>
+              </div>
 
-                  <button 
-                     onClick={handleTransfer}
-                     className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl hover:bg-black transition-all flex items-center justify-center gap-2"
+              <div className="p-6">
+                {/* Transaction Details */}
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-gray-600">From Account</span>
+                    <span className="font-mono font-medium">**** {fromAccount?.slice(-4)}</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-gray-600">To Account</span>
+                    <span className="font-mono font-medium">{form.toAccount.slice(0,4)}...{form.toAccount.slice(-4)}</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-gray-600">Amount</span>
+                    <span className="text-xl font-bold text-green-600">₹{Number(form.amount).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Transaction Fee</span>
+                    <span className="font-medium text-green-600">Free</span>
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-700">Total Debit</span>
+                    <span className="text-xl font-bold text-blue-700">₹{Number(form.amount).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => setStep(0)}
+                    className="flex-1 py-3 border-2 border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                   >
-                      Authorize Payment <ArrowRight size={18}/>
+                    Edit
                   </button>
+                  <button
+                    onClick={() => setStep(2)}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-800 transform transition-all duration-200 hover:scale-[1.02]"
+                  >
+                    Proceed to Pay
+                  </button>
+                </div>
               </div>
-           </div>
-      </DashboardLayout>
-  );
-
-  // 4. LOADING SCREEN
-  if (step === 3) return (
-      <DashboardLayout>
-          <div className="flex h-[80vh] flex-col items-center justify-center text-center">
-               <div className="relative">
-                   <div className="w-24 h-24 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-                   <div className="absolute inset-0 flex items-center justify-center">
-                       <ShieldCheck className="text-blue-600" size={32}/>
-                   </div>
-               </div>
-               <h2 className="text-xl font-bold text-gray-800 mt-8 mb-2">Processing Payment</h2>
-               <p className="text-gray-500 animate-pulse">{loadingMsg}</p>
-               <p className="text-xs text-gray-400 mt-8">Do not close this window or press back</p>
+            </div>
           </div>
+        </div>
       </DashboardLayout>
-  );
+    );
 
-  // 5. SUCCESS SCREEN
-  if (step === 4) return (
+  /* =====================================================
+     PIN
+     ===================================================== */
+
+  if (step === 2)
+    return (
       <DashboardLayout>
-          <div className="max-w-md mx-auto mt-8">
-              <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-                  <div className="bg-green-600 p-8 text-center text-white relative overflow-hidden">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white opacity-10 rounded-full blur-2xl"></div>
-                      <div className="relative z-10">
-                          <div className="w-16 h-16 bg-white text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                              <CheckCircle2 size={36} strokeWidth={3}/>
-                          </div>
-                          <h1 className="text-2xl font-bold">Payment Successful!</h1>
-                          <p className="opacity-90 mt-1 text-sm">Transaction completed on {new Date().toLocaleDateString()}</p>
-                          <h2 className="text-4xl font-bold mt-6">₹ {formatInputCurrency(form.amount)}</h2>
-                      </div>
-                  </div>
-                  
-                  <div className="p-8">
-                      <div className="border border-dashed border-gray-200 rounded-xl p-4 bg-gray-50 mb-6">
-                          <div className="grid grid-cols-2 gap-y-4 text-sm">
-                              <div className="text-gray-500">Transaction ID</div>
-                              <div className="text-right font-mono font-bold text-gray-800">TXN{Date.now().toString().slice(-8)}</div>
-                              
-                              <div className="text-gray-500">Paid to</div>
-                              <div className="text-right font-bold text-gray-800">{form.recipientName}</div>
-                              
-                              <div className="text-gray-500">Bank Ref No.</div>
-                              <div className="text-right font-mono text-gray-800">SBI{Math.floor(Math.random()*10000000)}</div>
-                              
-                              <div className="text-gray-500">Payment Mode</div>
-                              <div className="text-right font-bold text-gray-800">IMPS</div>
-                          </div>
-                      </div>
-
-                      <div className="flex gap-4">
-                          <button className="flex-1 py-3 border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 flex items-center justify-center gap-2">
-                             <Share2 size={18}/> Share
-                          </button>
-                          <button 
-                             onClick={() => {
-                                 setStep(0);
-                                 setForm({...form, amount: "", remarks: ""});
-                                 setPin(["","","",""]);
-                             }}
-                             className="flex-1 bg-blue-700 text-white font-bold rounded-xl hover:bg-blue-800 flex items-center justify-center gap-2"
-                          >
-                             Done
-                          </button>
-                      </div>
-                  </div>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
+                <h2 className="text-xl font-bold text-white">Enter PIN</h2>
+                <p className="text-blue-100 text-sm mt-1">Enter your 4-digit transaction PIN</p>
               </div>
+
+              <div className="p-8 text-center">
+                {/* Amount Display */}
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600">Amount to transfer</p>
+                  <p className="text-3xl font-bold text-blue-600">₹{Number(form.amount).toLocaleString()}</p>
+                </div>
+
+                {/* PIN Input */}
+                <div className="flex justify-center gap-3 mb-8">
+                  {[0, 1, 2, 3].map((i) => (
+                    <input
+                      key={i}
+                      id={`pin-${i}`}
+                      type="password"
+                      maxLength={1}
+                      className="w-14 h-14 border-2 border-gray-300 rounded-lg text-center text-2xl font-bold focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                      value={pin[i]}
+                      onChange={(e) => handlePin(i, e.target.value)}
+                      onKeyDown={(e) => handlePinKeyDown(i, e)}
+                      autoFocus={i === 0}
+                    />
+                  ))}
+                </div>
+
+                {/* Confirm Button */}
+                <button
+                  onClick={handleTransfer}
+                  disabled={loading || pin.join("").length !== 4}
+                  className={`w-full py-3 rounded-lg font-medium transform transition-all duration-200 hover:scale-[1.02] ${
+                    pin.join("").length === 4
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  Confirm Payment
+                </button>
+
+                {/* Back Button */}
+                <button
+                  onClick={() => setStep(1)}
+                  className="w-full mt-3 text-gray-600 py-2 hover:text-gray-800 transition-colors"
+                >
+                  Back
+                </button>
+              </div>
+            </div>
           </div>
+        </div>
       </DashboardLayout>
-  );
+    );
+
+  /* =====================================================
+     LOADING
+     ===================================================== */
+
+  if (step === 3)
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="text-center">
+                {/* Spinner */}
+                <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
+                
+                <h3 className="text-xl font-bold text-gray-800 mt-6">Processing Transaction</h3>
+                <p className="text-gray-600 mt-2">Please wait while we process your payment</p>
+                
+                {/* Progress Bar */}
+                <div className="mt-6 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-600 to-indigo-700 animate-pulse rounded-full" style={{ width: '60%' }}></div>
+                </div>
+                
+                <p className="text-sm text-gray-500 mt-4">Do not close this window</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+
+  /* =====================================================
+     SUCCESS
+     ===================================================== */
+
+  if (step === 4)
+    return (
+      <DashboardLayout>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-8 text-center">
+                {/* Success Icon */}
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-4">
+                  <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-white">Transaction Successful!</h2>
+              </div>
+
+              <div className="p-6">
+                {/* Transaction Details */}
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-gray-600">Amount Sent</span>
+                    <span className="text-2xl font-bold text-green-600">₹{Number(form.amount).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                    <span className="text-gray-600">To Account</span>
+                    <span className="font-mono font-medium">{form.toAccount.slice(0,4)}...{form.toAccount.slice(-4)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Date & Time</span>
+                    <span className="text-sm">{new Date().toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* New Balance */}
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-gray-700">New Balance</span>
+                    <span className="text-xl font-bold text-blue-700">₹{(balance - Number(form.amount)).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Done Button */}
+                <button
+                  onClick={reset}
+                  className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-3 rounded-lg font-medium hover:from-blue-700 hover:to-indigo-800 transform transition-all duration-200 hover:scale-[1.02]"
+                >
+                  Done
+                </button>
+
+                {/* View Transactions Link */}
+                <button
+                  onClick={() => navigate('/transactions')}
+                  className="w-full mt-3 text-blue-600 py-2 hover:text-blue-800 transition-colors"
+                >
+                  View Transaction History
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
 
   return null;
 }

@@ -17,7 +17,7 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping
+    @PostMapping("/send-money")
     public ResponseEntity<TransactionResponse> createTransaction(
             @RequestBody TransactionRequest request,
             @RequestHeader("Authorization") String token ) {

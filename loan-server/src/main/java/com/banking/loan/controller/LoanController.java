@@ -95,7 +95,7 @@ public class LoanController {
         return ResponseEntity.ok(loanService.approveLoan(loanId));
     }
 
-    @PatchMapping("/{loanId}/approve")
+    @PatchMapping("/{loanId}/reject")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> reject(@PathVariable Long loanId) {
         return ResponseEntity.ok(loanService.rejectLoan(loanId));

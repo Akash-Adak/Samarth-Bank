@@ -78,7 +78,7 @@ export default function AdminUsers() {
         <th className="p-3 w-[20%] text-left">Email</th>
 
         <th className="p-3 w-[12%] text-left">Phone</th>
-
+        <th className="p-3 w-[12%] text-left">Account Number</th>
         <th className="p-3 w-[12%] text-center">KYC</th>
 
         <th className="p-3 w-[10%] text-center">Status</th>
@@ -115,6 +115,7 @@ export default function AdminUsers() {
             {user.phone}
           </td>
 
+          <td className="p-3 truncate" >{user.accountNumber} </td>
           {/* KYC */}
           <td className="p-3 text-center">
 
