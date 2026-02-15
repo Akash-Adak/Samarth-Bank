@@ -50,15 +50,19 @@ public class AdminDashboardController {
         return ResponseEntity.ok(response);
     }
 
+
     @GetMapping("/loans/pending")
     public List<LoanDto> getPendingLoans() {
         return loanClient.getPendingLoans();
     }
-
 
     @GetMapping("/user/details")
     public List<UserModel> getUserList() {
         return userClient.getUserList();
     }
 
+    @GetMapping("/loans/active")
+    public List<LoanDto> getActiveLoans() {
+        return loanClient.getActiveLoans();
+    }
 }

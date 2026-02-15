@@ -30,6 +30,9 @@ public interface LoanClient {
 
     @PatchMapping("/api/loans/{id}/reject")
     LoanResponseDto rejectLoan(Long id);
+
+    @GetMapping("/api/loans/active")
+    List<LoanDto> getActiveLoans();
 }
 
 

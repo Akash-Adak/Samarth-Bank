@@ -280,6 +280,12 @@ public class LoanServiceImpl implements LoanService {
     public List<Loan> getPendingLoans() {
         return loanRepository.findByStatus(LoanStatus.PENDING);
     }
+
+    @Override
+    public List<Loan> getActiveLoans() {
+        return loanRepository.findByStatus(LoanStatus.APPROVED);
+    }
+
     @Override
     public LoanResponseDto rejectLoan(Long loanId) {
 
@@ -292,6 +298,8 @@ public class LoanServiceImpl implements LoanService {
 
         return mapToDto(loanRepository.save(loan));
     }
+
+
 
 
 }
