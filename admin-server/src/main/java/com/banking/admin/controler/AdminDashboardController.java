@@ -72,5 +72,11 @@ public class AdminDashboardController {
         return ResponseEntity.ok("User blocked successfully");
     }
 
+    @PatchMapping("/user/unblock/{accountNumber}")
+    public ResponseEntity<String> unBlockUser(@PathVariable String accountNumber) {
+        ResponseEntity<String>  u= userClient.unBlockUser(accountNumber);
+        return ResponseEntity.ok("User unblocked successfully");
+    }
+
 
 }

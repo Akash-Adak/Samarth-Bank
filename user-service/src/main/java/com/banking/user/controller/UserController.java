@@ -180,4 +180,12 @@ public ResponseEntity<?> updateKycStatus(@PathVariable String username,@PathVari
         return ResponseEntity.ok("User blocked successfully");
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/unblock/{accountNumber}")
+    public ResponseEntity<?> unBlockUser(@PathVariable String accountNumber){
+        User u= userService.unBlockUser(accountNumber);
+
+        return ResponseEntity.ok("User unblocked successfully");
+    }
+
 }

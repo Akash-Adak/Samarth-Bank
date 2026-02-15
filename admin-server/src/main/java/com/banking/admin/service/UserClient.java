@@ -30,6 +30,11 @@ public interface UserClient {
     @PatchMapping("/api/users/block/{accountNumber}")
     ResponseEntity<String> blockUser(@PathVariable("accountNumber") String accountNumber);
 
+
+    @PatchMapping("/api/users/unblock/{accountNumber}")
+    ResponseEntity<String> unBlockUser(@PathVariable("accountNumber") String accountNumber);
+
+
 //    @GetMapping("/api/users/blocked/count")
 //    Long countBlockedUsers();
 }

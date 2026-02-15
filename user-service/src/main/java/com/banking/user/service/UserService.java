@@ -229,4 +229,10 @@ public class UserService {
         old.setUserStatus(UserStatus.BLOCKED);
         return userRepository.save(old);
     }
+
+    public User unBlockUser(String accountNumber) {
+        User old = userRepository.findByAccountNumber(accountNumber) .orElseThrow(() -> new RuntimeException("User not found with account number: " + accountNumber));
+        old.setUserStatus(UserStatus.ACTIVE);
+        return userRepository.save(old);
+    }
 }
