@@ -22,4 +22,5 @@ public class AdminDashboardResponse {
     private Long todayTransactions;
 
     private Long blockedUsers;
+    private Long activeLoans;
 }

@@ -116,4 +116,10 @@ public class LoanController {
     public List<Loan> getActiveLoans() {
         return loanService.getActiveLoans();
     }
+
+    @GetMapping("/active/count")
+    public Long getActiveLoansCount() {
+        List<Loan> list =loanService.getActiveLoans();
+        return list.size() > 0 ? (long) list.size() : 0L;
+    }
 }
