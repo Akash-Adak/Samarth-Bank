@@ -37,3 +37,6 @@ export const getActiveLoans = () =>
 export const blockUser = (accountNumber) =>
   api.patch(`/dashboard/user/block/${accountNumber}`);
 
+export const unBlockUser = (accountNumber) =>
+  api.patch(`/dashboard/user/unblock/${accountNumber}`);
+

@@ -3,8 +3,8 @@ import DashboardLayout from "../../layout/DashboardLayout";
 
 import {
   getAllUsers,
-  blockUser
-  // unblockUser
+  blockUser,
+  unBlockUser
 } from "../../api/adminApi";
 
 export default function AdminUsers() {
@@ -34,15 +34,15 @@ export default function AdminUsers() {
     if (!window.confirm("Block this user?")) return;
 
     const res=await blockUser(accountNumber);
-    console.log(res.data);
+  
     loadUsers();
   };
 
-  const handleUnblock = async (id) => {
+  const handleUnblock = async (accountNumber) => {
 
     if (!window.confirm("Unblock this user?")) return;
 
-    await unblockUser(id);
+   const res= await unBlockUser(accountNumber);
 
     loadUsers();
   };
@@ -154,7 +154,7 @@ export default function AdminUsers() {
             {user.userStatus==='BLOCKED' ? (
 
               <button
-                onClick={() => handleUnblock(user.id)}
+                onClick={() => handleUnblock(user.accountNumber)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition"
               >
                 Unblock
