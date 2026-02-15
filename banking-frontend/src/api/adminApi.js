@@ -33,3 +33,7 @@ export const getAllUsers = () =>
 
 export const getActiveLoans = () =>
   api.get("/dashboard/loans/active");
+
+export const blockUser = (accountNumber) =>
+  api.patch(`/dashboard/user/block/${accountNumber}`);
+

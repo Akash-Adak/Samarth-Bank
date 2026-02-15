@@ -66,9 +66,9 @@ public class AdminDashboardController {
         return loanClient.getActiveLoans();
     }
 
-    @PatchMapping("/user/block/{ac" + "countNumber}")
+    @PatchMapping("/user/block/{accountNumber}")
     public ResponseEntity<String> blockUser(@PathVariable String accountNumber) {
-        userClient.blockUser(accountNumber);
+        ResponseEntity<String>  u= userClient.blockUser(accountNumber);
         return ResponseEntity.ok("User blocked successfully");
     }
 

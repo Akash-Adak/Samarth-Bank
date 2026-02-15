@@ -3,9 +3,11 @@ package com.banking.admin.service;
 import com.banking.admin.config.FeignForceConfig;
 import com.banking.admin.dto.UserModel;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -26,7 +28,7 @@ public interface UserClient {
     List<UserModel> getUserList();
 
     @PatchMapping("/api/users/block/{accountNumber}")
-    void blockUser(String accountNumber);
+    ResponseEntity<String> blockUser(@PathVariable("accountNumber") String accountNumber);
 
 //    @GetMapping("/api/users/blocked/count")
 //    Long countBlockedUsers();

@@ -21,4 +21,5 @@ public class UserModel {
     private String docType;    // PAN / AADHAAR
     private String docHash;
     private LocalDate dob;
+    private  String userStatus;
 }
