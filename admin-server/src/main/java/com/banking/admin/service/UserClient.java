@@ -5,6 +5,7 @@ import com.banking.admin.dto.UserModel;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 import java.util.List;
 
@@ -23,6 +24,9 @@ public interface UserClient {
 
     @GetMapping("/api/users/getAll")
     List<UserModel> getUserList();
+
+    @PatchMapping("/api/users/block/{accountNumber}")
+    void blockUser(String accountNumber);
 
 //    @GetMapping("/api/users/blocked/count")
 //    Long countBlockedUsers();

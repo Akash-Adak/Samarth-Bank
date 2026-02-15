@@ -164,4 +164,19 @@ public ResponseEntity<?> updateKycStatus(@PathVariable String username,@PathVari
         List<UserModel> users=  userService.getAllUsers();
         return new ResponseEntity<>(users,HttpStatus.OK);
     }
+
+    @PatchMapping("/block/{accountNumber}")
+    public ResponseEntity<?> blockUser(@PathVariable String accountNumber){
+        User u= userService.blockUser(accountNumber);
+        User cachedUser = redisService.get(u.getUsername(), User.class);
+        if (cachedUser != null) {
+            Optional<User> users = userService.getUserByUsername(u.getUsername());
+            if (users.isPresent()) { User userObj = users.get();
+                redisService.set(u.getUsername(), userObj, 3600L);
+                return new ResponseEntity<>(userObj, HttpStatus.OK);
+            }
+        }
+        return ResponseEntity.ok(u);
+    }
+
 }

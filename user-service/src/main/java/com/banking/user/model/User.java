@@ -32,6 +32,17 @@ public class User {
     private String docHash;
     private LocalDate dob;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private  UserStatus userStatus;
+
+    public UserStatus getStatus() {
+        return userStatus;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.userStatus = status;
+    }
 
     public String getDocType() {
         return docType;
