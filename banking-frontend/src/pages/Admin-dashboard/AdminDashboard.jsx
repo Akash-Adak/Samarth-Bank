@@ -183,7 +183,7 @@ export default function AdminDashboard() {
           title="Pending KYC"
           value={data?.pendingKyc}
           icon={FileText}
-          link="/admin/kyc"
+          link="/admin/users"
           color="yellow"
           badge={data?.pendingKyc > 0}
         />
