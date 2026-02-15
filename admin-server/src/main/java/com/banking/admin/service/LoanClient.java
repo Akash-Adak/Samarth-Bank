@@ -28,8 +28,14 @@ public interface LoanClient {
     @GetMapping("/api/loans/pending/count")
     Long countPendingLoans();
 
+    @GetMapping("/api/loans/active/count")
+    Long countActiveLoans();
+
     @PatchMapping("/api/loans/{id}/reject")
     LoanResponseDto rejectLoan(Long id);
+
+    @GetMapping("/api/loans/active")
+    List<LoanDto> getActiveLoans();
 }
 
 

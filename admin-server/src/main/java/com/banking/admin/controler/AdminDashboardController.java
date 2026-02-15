@@ -50,15 +50,33 @@ public class AdminDashboardController {
         return ResponseEntity.ok(response);
     }
 
+
     @GetMapping("/loans/pending")
     public List<LoanDto> getPendingLoans() {
         return loanClient.getPendingLoans();
     }
 
-
     @GetMapping("/user/details")
     public List<UserModel> getUserList() {
         return userClient.getUserList();
     }
+
+    @GetMapping("/loans/active")
+    public List<LoanDto> getActiveLoans() {
+        return loanClient.getActiveLoans();
+    }
+
+    @PatchMapping("/user/block/{accountNumber}")
+    public ResponseEntity<String> blockUser(@PathVariable String accountNumber) {
+        ResponseEntity<String>  u= userClient.blockUser(accountNumber);
+        return ResponseEntity.ok("User blocked successfully");
+    }
+
+    @PatchMapping("/user/unblock/{accountNumber}")
+    public ResponseEntity<String> unBlockUser(@PathVariable String accountNumber) {
+        ResponseEntity<String>  u= userClient.unBlockUser(accountNumber);
+        return ResponseEntity.ok("User unblocked successfully");
+    }
+
 
 }

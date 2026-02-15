@@ -29,3 +29,14 @@ export const rejectLoan = (id) =>
 
 export const getAllUsers = () =>
   api.get(`/dashboard/user/details`);
+
+
+export const getActiveLoans = () =>
+  api.get("/dashboard/loans/active");
+
+export const blockUser = (accountNumber) =>
+  api.patch(`/dashboard/user/block/${accountNumber}`);
+
+export const unBlockUser = (accountNumber) =>
+  api.patch(`/dashboard/user/unblock/${accountNumber}`);
+

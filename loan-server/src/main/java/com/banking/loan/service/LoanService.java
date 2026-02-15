@@ -31,4 +31,6 @@ public interface LoanService {
     List<Loan> getPendingLoans();
 
 
+    List<Loan> getActiveLoans();
+
 }

@@ -3,6 +3,7 @@ package com.banking.user.service;
 import com.banking.user.model.IdentityRegistry;
 import com.banking.user.model.User;
 import com.banking.user.model.UserModel;
+import com.banking.user.model.UserStatus;
 import com.banking.user.repository.UserRepository;
 import com.banking.user.response.RegisterRequestResponse;
 
@@ -40,6 +41,7 @@ public class UserService {
         user.setKycStatus(userModel.getKycStatus());
         user.setFullname(userModel.getFullname());
         user.setKycStatus("PENDING");
+        user.setUserStatus(UserStatus.ACTIVE);
 //        user.setDob(userModel.getDob());
 //        user.setDocHash(sha256(userModel.getDocHash()));
 //        user.setDocType(userModel.getDocType());
@@ -217,7 +219,20 @@ public class UserService {
             model.setFullname(user.getFullname());
             model.setKycStatus(user.getKycStatus());
             model.setAccountNumber(user.getAccountNumber());
+            model.setUserStatus(String.valueOf(user.getUserStatus()));
             return model;
         }).toList();
+    }
+
+    public User blockUser(String accountNumber) {
+        User old = userRepository.findByAccountNumber(accountNumber) .orElseThrow(() -> new RuntimeException("User not found with account number: " + accountNumber));
+        old.setUserStatus(UserStatus.BLOCKED);
+        return userRepository.save(old);
+    }
+
+    public User unBlockUser(String accountNumber) {
+        User old = userRepository.findByAccountNumber(accountNumber) .orElseThrow(() -> new RuntimeException("User not found with account number: " + accountNumber));
+        old.setUserStatus(UserStatus.ACTIVE);
+        return userRepository.save(old);
     }
 }

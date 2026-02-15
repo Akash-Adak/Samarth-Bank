@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 
 import {
-  getAllUsers
-//   blockUser,
-//   unblockUser
+  getAllUsers,
+  blockUser,
+  unBlockUser
 } from "../../api/adminApi";
 
 export default function AdminUsers() {
@@ -29,20 +29,20 @@ export default function AdminUsers() {
     }
   };
 
-  const handleBlock = async (id) => {
+  const handleBlock = async (accountNumber) => {
 
     if (!window.confirm("Block this user?")) return;
 
-    await blockUser(id);
-
+    const res=await blockUser(accountNumber);
+  
     loadUsers();
   };
 
-  const handleUnblock = async (id) => {
+  const handleUnblock = async (accountNumber) => {
 
     if (!window.confirm("Unblock this user?")) return;
 
-    await unblockUser(id);
+   const res= await unBlockUser(accountNumber);
 
     loadUsers();
   };
@@ -136,7 +136,7 @@ export default function AdminUsers() {
           {/* STATUS */}
           <td className="p-3 text-center">
 
-            {user.blocked ? (
+            {user.userStatus==='BLOCKED' ? (
               <span className="text-red-600 font-semibold">
                 Blocked
               </span>
@@ -151,10 +151,10 @@ export default function AdminUsers() {
           {/* ACTION */}
           <td className="p-3 text-center space-x-2">
 
-            {user.blocked ? (
+            {user.userStatus==='BLOCKED' ? (
 
               <button
-                onClick={() => handleUnblock(user.id)}
+                onClick={() => handleUnblock(user.accountNumber)}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition"
               >
                 Unblock
@@ -163,7 +163,7 @@ export default function AdminUsers() {
             ) : (
 
               <button
-                onClick={() => handleBlock(user.id)}
+                onClick={() => handleBlock(user.accountNumber)}
                 className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs transition"
               >
                 Block
