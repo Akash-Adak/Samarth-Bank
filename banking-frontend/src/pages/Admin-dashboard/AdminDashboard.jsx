@@ -219,7 +219,7 @@ export default function AdminDashboard() {
           title="Active Loans"
           value={data?.activeLoans || '0'}
           icon={CheckCircle}
-          link="/admin/loans"
+          link="/admin/loans/active"
           color="emerald"
         />
         

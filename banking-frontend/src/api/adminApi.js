@@ -29,3 +29,7 @@ export const rejectLoan = (id) =>
 
 export const getAllUsers = () =>
   api.get(`/dashboard/user/details`);
+
+
+export const getActiveLoans = () =>
+  api.get("/dashboard/loans/active");

@@ -24,6 +24,7 @@ import AdminRoute from "./components/AdminRoute";
 import KycPage from "./pages/dashboard/KycPage";
 import AdminLoans from "./pages/Admin-dashboard/AdminLoans";
 import AdminUsers from "./pages/Admin-dashboard/AdminUsers";
+import AdminActiveLoans from "./pages/Admin-dashboard/AdminActiveLoans";
 
 export default function App() {
   const username = localStorage.getItem("username");
@@ -152,6 +153,12 @@ export default function App() {
           path="/admin/loans"
           element={  <AdminRoute> <AdminLoans/> </AdminRoute>}
         />
+
+        <Route
+          path="/admin/loans/active"
+          element={<AdminRoute> <AdminActiveLoans/></AdminRoute>}
+        />
+
           <Route
             path="/admin/users"
             element={
